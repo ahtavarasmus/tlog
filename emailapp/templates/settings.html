@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<h4>Current Categories:</h4>
+<ul>
+    {% for category in ecategories %}
+        <li>{{ category.name }}</li>
+    {% endfor %}
+</ul>
+<form action="/settings/" method='POST'>
+    <button type="submit" name='submit' value="send">Send an email</button>
+    <button type="submit" name='submit' value="receive">add answer from gmail</button>
+    <button type="submit" name='submit' value="ski">ski</button>
+    <button type="submit" name='submit' value="run">run</button>
+    <br>
+    <br>
+    <label for="checkbox">Do you want to be in email list?</label>
+    {% if user.in_email_list == true %}
+    <button type="checkbox" name='submit' value="false" checked>Yes</button>
+    {% else %}
+    <button type="checkbox" name='submit' value="true">No</button>
+    {% endif %}
+    <br>
+    <br>
+    <label for="new_category">Set a new category</label>
+    <input type="text" name="new_category" placeholder="create a new category">
+    <input type="submit" value="Create">
+
+</form>
+{% endblock %}

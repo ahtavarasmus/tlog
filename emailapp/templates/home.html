@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+{% if user.is_authenticated %}
+<p>Logged in as {{ user.username }}</p>
+
+<head>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js'></script>
+    <style>
+        ul {list-style-type:none;}
+        body {font-family: Verdana, sans-serif;}
+        /*Month header */
+        .month {
+            
+            padding:70px 25px;
+            width: 100%;
+            background: #222222;
+            text-align: center;
+        }
+        /* Month list */
+        .month ul {
+        display: flex;
+        justify-content: space-around;
+        margin: 0;
+        padding: 0;
+        }
+
+        .month ul li {
+        color: rgb(44, 182, 247);
+        width: 33%;
+        font-size: 20px;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        
+        }
+        .month ul li a {
+            display: block;
+        }
+
+        /* Previous button inside month header */
+        .month .prev {
+        width: 100px;
+        height: 100px;
+        } 
+
+        /* Next button */
+        .month .next {
+        width: 100px;
+        height: 100px;
+        }
+
+        /* Weekdays (Mon-Sun) */
+        .weekdays {
+        display: flex;
+        justify-content: space-around;
+        margin: 0;
+        padding: 10px 0;
+        background-color:rgb(44, 182, 247);
+        }
+
+        .weekdays li {
+        display: inline-block;
+        width: 13.6%;
+        color: #eee;
+        text-align: center;
+        }
+
+        /* Days (1-31) */
+        .days {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        padding: 10px 0;
+        background: #222222;
+        margin: 0;
+        
+        }
+
+        .days div {
+        list-style-type: none;
+        display: inline-block;
+        width: 13.6%; 
+        height: 70px;
+        line-height: 70px;
+        text-align: center;
+        margin-bottom: 5px;
+        font-size:12px;
+        color: rgb(44, 182, 247);
+        background-color: #222222;
+        }
+        .days div a {
+            display: block;
+            color: inherit;
+            text-decoration: inherit;
+        }
+        .monthdays:hover {
+            background-color: rgb(44, 182, 247);
+
+        }
+
+        /* Highlight the "current" day */
+        .days div .active {
+        padding: 5px;
+        background: #1abc9c;
+        color: white !important
+        }
+
+        #monthdays {
+            background-color: #302e2e;
+        }
+        #monthdays:hover {
+            background-color: rgb(44, 182, 247);
+            color: #302e2e;
+        }
+    </style>
+
+</head> 
+    
+<div class="month">
+    <ul>
+        <li class="prev">
+            <a href="/previous-month-{{ current_month_int }}" method='POST'> &#10094;</a>
+            <br>
+            <a href="/previous-year-{{ current_year }}" method='POST'> &#10094;</a>
+        </li>
+        <li>{{ current_month_name }}<br><span style="font-size:18px">{{ current_year }}</span></li>
+        <li class="next">
+            <a href="/next-month-{{ current_month_int }}" method='POST'> &#10095;</a>
+            <br>
+            <a href="/next-year-{{ current_year }}" method='POST'> &#10095;</a>
+        </li>
+    </ul>
+</div>
+<ul class="weekdays">
+    <li>Mo</li>
+    <li>Tu</li>
+    <li>We</li>
+    <li>Th</li>
+    <li>Fr</li>
+    <li>Sa</li>
+    <li>Su</li>
+</ul>
+<div class="days">
+    {% for last_mo_day in fill_last_month %}
+    <div class="notmonthdays">{{ last_mo_day }} 
+    </div>
+    {% endfor %}
+    {% for daynum in list_of_days %}
+    <div id="monthdays"> 
+       <a href="/training-ap-{{ daynum }}-{{ current_month_int }}-{{ current_year }}">
+           {{daynum}}
+       </a>  
+    </div>
+    {% endfor %}
+    {% for next_mo_day in fill_next_month %}
+    <div class="notmonthdays"> {{ next_mo_day }}</div>
+    {% endfor %}
+    
+</div>
+
+<div class="container text-center">
+    <div class="row">
+        <div class="col category-time">
+            {% for tc_time, tcat, color in cat_set %}
+            <p>{{tcat.name}} : {{tc_time}}mins</p>
+            {% endfor %}
+        </div>
+        <div class="col intensity-time">
+            {% for ti_time, tint, color in int_set %}
+            <p>{{tint.name}} : {{ti_time}}mins</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+
+
+{% else %}
+<p>Not logged in.</p>
+{% endif %}
+
+
+{% endblock %}
