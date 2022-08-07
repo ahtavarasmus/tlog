@@ -8,7 +8,7 @@
     {% endfor %}
 </ul>
 <form action="/settings/" method='POST'>
-    <button type="submit" name='submit' value="send">Send an email</button>
+    <!-- <button type="submit" name='submit' value="send">Send an email</button>
     <button type="submit" name='submit' value="receive">add answer from gmail</button>
     <button type="submit" name='submit' value="ski">ski</button>
     <button type="submit" name='submit' value="run">run</button>
@@ -20,11 +20,15 @@
     {% else %}
     <button type="checkbox" name='submit' value="true">No</button>
     {% endif %}
+    <br> -->
+    
+    <label for="phonenumber">Phone Number</label>
+    <input type="text" id="phonenumber" name="phonenumber">
+    <button type="submit" name="submit" value="phonenumber">Add</button>
+
+
     <br>
-    <br>
-    <label for="new_category">Set a new category</label>
-    <input type="text" name="new_category" placeholder="create a new category">
-    <input type="submit" value="Create">
+    <p> = {{ phone_number }}</p>
 
 </form>
 {% endblock %}

@@ -146,11 +146,23 @@
     </div>
     {% endfor %}
     {% for daynum in list_of_days %}
-    <div id="monthdays"> 
+    {% if daynum == current_day %}
+    <div style="background-color: rgb(44, 182, 247);color: #302e2e;" id="monthdays"> 
        <a href="/training-ap-{{ daynum }}-{{ current_month_int }}-{{ current_year }}">
+           
            {{daynum}}
        </a>  
     </div>
+    {% else %}
+    <div id="monthdays"> 
+       <a href="/training-ap-{{ daynum }}-{{ current_month_int }}-{{ current_year }}">
+           
+           {{daynum}}
+       </a>  
+    </div>
+
+    {% endif %}
+
     {% endfor %}
     {% for next_mo_day in fill_next_month %}
     <div class="notmonthdays"> {{ next_mo_day }}</div>
@@ -160,6 +172,9 @@
 
 <div class="container text-center">
     <div class="row">
+        <div class="col category-time">
+            {{ current_day }}
+        </div>
         <div class="col category-time">
             {% for tc_time, tcat, color in cat_set %}
             <p>{{tcat.name}} : {{tc_time}}mins</p>

@@ -1,5 +1,4 @@
 from flask_login import UserMixin
-from sqlalchemy.orm import defaultload
 from . import db
 from datetime import date
 
@@ -10,6 +9,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String(150))
     in_email_list = db.Column(db.Boolean, default=False)
+    phone_number = db.Column(db.String(100))
     
     categories = db.relationship('Category', backref='user', lazy='select')
     trainings = db.relationship(
@@ -26,6 +26,7 @@ class Training(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     body = db.Column(db.String(400))
+
 
     timeofday = db.Column(db.String(50))
     training_date = db.Column(db.String(200), nullable=False) 

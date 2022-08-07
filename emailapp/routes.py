@@ -311,7 +311,7 @@ def home():
         session['month'] = month
 
 
-        # i have to put the current year and month to database always 
+        # i have to put the current year and month to session always 
         # temporally cause that way i can refresh the page for 
         # next year and remember the selection for that users session.
         return redirect(url_for('routes.home'))
@@ -392,9 +392,10 @@ def training_day(timeofday, day, month, year):
 @routes.route("/settings/", methods=['POST','GET'])
 def settings():
     ecategories = current_user.categories
+    phone_number = current_user.phone_number
     if request.method == 'POST':
         
-        if request.form['submit'] == 'send':
+        """ if request.form['submit'] == 'send':
             send_email()
             return "Sent"
         elif request.form['submit'] == 'receive':
@@ -422,8 +423,11 @@ def settings():
             db.session.commit()
         elif request.form['submit'] == 'true':
             current_user.in_email_list = True
-            db.session.commit()
-        else:
+            db.session.commit() """
+        number = request.form['phonenumber']
+        current_user.phone_number = number
+        db.session.commit()
+        """ else:
             new_category = request.form['new_category']
             new_category_obj = Category(user=current_user, name=new_category)
             try:
@@ -431,9 +435,9 @@ def settings():
                 db.session.commit()
             except:
                 return 'There was an error adding category to the db'
-
+ """
         return redirect(url_for('routes.settings'))
-    return render_template('settings.html', user=current_user, ecategories=ecategories)
+    return render_template('settings.html', user=current_user, ecategories=ecategories, phone_number=phone_number)
 
 @routes.route("/previous-year-<curryear>/")
 def previous_year(curryear):
