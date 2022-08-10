@@ -227,9 +227,6 @@ def training_day(year, month, day):
     diff_obj = todays_date - date_obj
     diff_in_days = diff_obj.days
 
-    # constructing a simple date for training object
-
-    
 
     # making variables for ap and ip and a list of other trainings for this current day
     trainings = []
