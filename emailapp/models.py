@@ -29,7 +29,7 @@ class Training(db.Model, UserMixin):
 
 
     timeofday = db.Column(db.String(50))
-    training_date = db.Column(db.String(200), nullable=False) 
+    training_date = db.Column(db.Datetime) 
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     sections = db.relationship('TrainingSection', backref='training')
