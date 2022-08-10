@@ -1,6 +1,7 @@
-from . import routes
+from routes import * 
 from . import db
 from datetime import datetime as dt
+from models import *
 
 """ def add_to_db():
     raw_main = request.form['main']
@@ -126,12 +127,14 @@ from datetime import datetime as dt
 
 
 
-def add_training_to_db(raw_main,timeofday,day,month,year):
+def add_training_to_db(raw_main,day,month,year):
 
     # training_date = day + ' ' + month + ' ' + year 
-    training_date = datetime
-    date = dt(dt.now().year,dt.now().month,dt.now().day)
-    date_obj = datetime.date(int(year),int(month),int(day))
+    training_date = dt(int(year),int(month),int(day))
+
+    # extracting the timeofday from the front
+    timeofday, main = raw_main.split()
+
     # making the training object
     new_training = Training(user=current_user, name=raw_main, timeofday=timeofday,training_date=training_date)
     try:
@@ -153,8 +156,9 @@ def add_training_to_db(raw_main,timeofday,day,month,year):
 
     # checking which section had the most time so i can name the whole training by it
     leading_sec = 0
+
     # splitting training into parts
-    sections = raw_main.split('+')
+    sections = main.split('+')
     for section in sections:
         ttype, intensity, ttime = section.split(',')
         section_obj = TrainingSection(user=current_user,name=ttype)
@@ -201,7 +205,7 @@ def add_training_to_db(raw_main,timeofday,day,month,year):
                 month_obj = item
                 month_found = True
         if not month_found:
-            month_obj = Month(user=current_user, num=int(month), name=date_obj.strftime("%B"), year=year_obj)
+            month_obj = Month(user=current_user, num=int(month), name=training_date.strftime("%B"), year=year_obj)
 
 
         db.session.add(month_obj)

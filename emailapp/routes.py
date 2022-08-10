@@ -1,23 +1,19 @@
 from email.quoprimime import body_check
-from re import I
 from textwrap import fill
 from flask import redirect, url_for, render_template, request, Blueprint, Markup, json, current_app
 from flask_login import login_required, current_user
 from flask_mail import Message
 from .models import MonthsCategorysIntensity, MonthsTrainingCategory, User, Training, TrainingSection, Category, Month, Year
 from . import db,mail
-import datetime
+from datetime import datetime as dt
 
 from dotenv import load_dotenv
 
 from calendar import monthrange
 from flask import session
-import calendar
-import email
-import imaplib
-import os
-import re
-import time
+import calendar, email, imaplib, os, re, time
+from functions import add_training_to_db
+
 
 load_dotenv()
 
@@ -110,126 +106,6 @@ def receive_email_body():
 
     return 'no messages:('
 
-def add_training_to_db(raw_main,timeofday,day,month,year):
-
-    training_date = day + ' ' + month + ' ' + year 
-    date_obj = datetime.date(int(year),int(month),int(day))
-    # making the training object
-    new_training = Training(user=current_user, name=raw_main, timeofday=timeofday,training_date=training_date)
-    try:
-        db.session.add(new_training)
-        db.session.commit()
-    except:
-        return 'There was an arror adding training to db'
-
-    # getting existing category objects
-    ecategories = current_user.categories
-    # if no, redirect to making some categories first
-    if ecategories == []:
-        return redirect(url_for('routes.settings'))
-    
-    # making a list of category names
-    cat_names = []
-    for cat in ecategories:
-        cat_names.append(cat.name)
-
-    # checking which section had the most time so i can name the whole training by it
-    leading_sec = 0
-    # splitting training into parts
-    sections = raw_main.split('+')
-    for section in sections:
-        ttype, intensity, ttime = section.split(',')
-        section_obj = TrainingSection(user=current_user,name=ttype)
-
-        if int(ttime) > leading_sec:
-            new_training.name = ttype
-            leading_sec = int(ttime) 
-        # finding the existing category for ttype
-        if not ttype in cat_names:
-            return 'the category:', ttype, 'not found, create it in settings:)'
-        
-        # assigning category
-        for item in ecategories:
-            if ttype == item.name:
-                section_obj.category = item
-                break
-
-        # assigning intensity
-
-        # assigning intensity
-        section_obj.intensity = intensity
-        section_obj.time = ttime
-        section_obj.training = new_training
-
-        # commiting section_obj
-        db.session.add(section_obj)
-        db.session.commit()
-        # checking if there's an existing year object
-        year_found = False
-        for item in current_user.years:
-            if item.num == int(year):
-                year_obj = item
-                year_found = True
-        if not year_found:
-            year_obj = Year(user=current_user, num=int(year))
-
-        db.session.add(year_obj)
-        db.session.commit()
-
-        # checking if there's an existing month object
-        month_found = False
-        for item in current_user.months:
-            if item.num == int(month):
-                month_obj = item
-                month_found = True
-        if not month_found:
-            month_obj = Month(user=current_user, num=int(month), name=date_obj.strftime("%B"), year=year_obj)
-
-
-        db.session.add(month_obj)
-        db.session.commit()
-        
-        # adding everything also to Month objects summary
-        mtc_found = False
-        for c in month_obj.training_categories:
-            if c.name == ttype:
-                mtc = c
-                mtc_found = True
-        if not mtc_found:
-            mtc = MonthsTrainingCategory(name=ttype,month=month_obj)
-            db.session.add(mtc)
-            db.session.commit()
-
-        # searching for existing mci
-        mci_found = False
-        for i in mtc.intensities:
-            if i.name == intensity:
-                mci = i
-                mci_found = True
-        if not mci_found:
-            mci = MonthsCategorysIntensity(name=intensity, month=month_obj)
-            db.session.add(mci)
-            db.session.commit()
-
-
-
-        if mci.overall_time != None:
-            etime = int(mci.overall_time)
-        else:
-            etime = 0
-
-        etime += int(ttime)
-        mci.overall_time = str(etime)
-        mci.months_training_category = mtc
-        db.session.add(mci)
-        db.session.commit()
-
-
-    try:
-        db.session.add(new_training)
-        db.session.commit()
-    except:
-        return "failed adding a new_training to db"
 
 
 @login_required
@@ -338,51 +214,43 @@ def home():
     )
 
 @login_required
-@routes.route("/training-<timeofday>-<day>-<month>-<year>/", methods=['POST', 'GET'])
-def training_day(timeofday, day, month, year):
+@routes.route("/training-<day>-<month>-<year>/", methods=['POST', 'GET'])
+def training_day(year, month, day):
 
     # THINK ABOUT DO YOU EVEN NEED THESE MONTH AND YEAR CLASSES OKAY they are useful not having to load up summary everytime you open new month but you could remove them now and 
     # implement those later if needed. RIGHT now figure out if you could just use datetime.date() to sort these trainings on their correct days and daytimes.
-    URL = "/training-" + timeofday + "-" + day + "-" + month + "-" + year + "/"
+    URL = "/training-" + day + "-" + month + "-" + year + "/"
 
     # how many days ago
-    date_obj = datetime.date(int(year),int(month),int(day))
-    today = datetime.date.today()
-    diff_obj = today - date_obj
+    date_obj = dt(int(year),int(month),int(day))
+    todays_date = dt(dt.now().year,dt.now().month, dt.now().day)
+    diff_obj = todays_date - date_obj
     diff_in_days = diff_obj.days
 
     # constructing a simple date for training object
-    training_date = day + ' ' + month + ' ' + year 
 
     
 
     # making variables for ap and ip and a list of other trainings for this current day
-    plus_trainings = []
-    morning_training = 0
-    noon_training = 0
-    # adding todays trainings to daystrainings
-    trainings = current_user.trainings
-    for t in trainings:
-        if t.training_date == training_date:
-            if t.timeofday == 'ap':
-                morning_training = t
-            elif t.timeofday == 'ip':
-                noon_training = t
-            else:
-                plus_trainings.append(t)
+    trainings = []
+    # adding todays trainings 
+    for t in current_user.trainings:
+        if t.training_date == todays_date:
+            trainings.append(t)
+    
+    def get_date(training):
+        return training.training_date
+    
+    trainings.sort(key=get_date)
 
     if request.method == 'POST':
         raw_main = request.form['main']
-        add_training_to_db(raw_main,timeofday,day,month,year)
+        add_training_to_db(raw_main,day,month,year)
         return redirect(URL)
 
     return render_template('training_day.html', 
     user=current_user, 
-    morning_training=morning_training,
-    noon_training=noon_training,
-    plus_trainings=plus_trainings,
     trainings=trainings, 
-    timeofday=timeofday, 
     diff_in_days=diff_in_days,
     day=day, 
     month=month, 
