@@ -360,8 +360,8 @@ def next_day(day,month,year):
     return redirect(n_url)
 
 @ login_required
-@ routes.route('/delete-training-<id>-<timeofday>-<day>-<month>-<year>/')
-def delete_training(id,timeofday,day,month,year):
+@ routes.route('/delete-training-<id>-<day>-<month>-<year>/')
+def delete_training(id,day,month,year):
     training = Training.query.filter_by(id=id).first()
     for section in training.sections:
         # removing also from the month and it's followers
@@ -394,7 +394,7 @@ def delete_training(id,timeofday,day,month,year):
         db.session.commit()
 
 
-    backurl = '/training-' + timeofday + '-' + day + '-' + month + '-' + year + '/'
+    backurl = '/training-' + day + '-' + month + '-' + year + '/'
     db.session.delete(training)
     db.session.commit()
     return redirect(backurl)

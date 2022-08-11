@@ -25,7 +25,7 @@ class User(db.Model, UserMixin):
 class Training(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    body = db.Column(db.String(400))
+    comment = db.Column(db.String(400))
 
 
     timeofday = db.Column(db.String(50))
