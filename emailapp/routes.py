@@ -6,13 +6,14 @@ from flask_mail import Message
 from .models import MonthsCategorysIntensity, MonthsTrainingCategory, User, Training, TrainingSection, Category, Month, Year
 from . import db,mail
 from datetime import datetime as dt
+import datetime
 
 from dotenv import load_dotenv
 
 from calendar import monthrange
 from flask import session
 import calendar, email, imaplib, os, re, time
-from functions import add_training_to_db
+from .functions import add_training_to_db
 
 
 load_dotenv()
@@ -26,7 +27,7 @@ gmail_host = 'imap.gmail.com'
 
 
 def send_emails():
-    today = datetime.date.today()
+    today = dt.today()
     mail.init_app(current_app)
     for user in User.query.all():
         if user.in_email_list:
@@ -35,7 +36,7 @@ def send_emails():
             mail.send(msg)
 
 def send_email():
-    today = datetime.date.today()
+    today = dt.today()
     mail.init_app(current_app)
     msg = Message(f'{today.day}.{today.month}.{today.year} fill today:D', sender=username,recipients=[current_user.email])
     msg.body = 'What did you do today?:)'
@@ -122,12 +123,12 @@ def home():
         # current_month_int: int
     current_month_name = calendar.month_name[current_month_int]
         # current_month_name: string
-    current_day = datetime.datetime.now().day
+    current_day = dt.now().day
     # current_day: int
     days_in_month = monthrange(current_year, current_month_int)[1]
     # days_in_month: int
     list_of_days = [item for item in range(1,days_in_month + 1)]
-    firstday_int = datetime.datetime(year=current_year, month=current_month_int, day=1).weekday()
+    firstday_int = dt(year=current_year, month=current_month_int, day=1).weekday()
     # firstday_int: int, weekday(0-6)
     if (current_month_int - 1) < 1:
         last_mo_year = current_year - 1
@@ -181,7 +182,7 @@ def home():
 
     if request.method == 'POST':
         year = request.form['year']
-        month = datetime.datetime.strptime(request.form['month'], "%B").month
+        month = dt.strptime(request.form['month'], "%B").month
         # adding to the session
         session['year'] = year
         session['month'] = month
@@ -338,13 +339,13 @@ def next_month(currmonth):
 
 @routes.route("/prevday-<day>-<month>-<year>/")
 def prev_day(day,month,year):
-    d = datetime.date(int(year),int(month),int(day))
+    d = dt(int(year),int(month),int(day))
     d_prev = d - datetime.timedelta(days=1)
     p_day,p_month,p_year = d_prev.day,d_prev.month,d_prev.year
     session['year'] = p_year
     session['month'] = p_month
     session['day'] = p_day
-    p_url = "/training-ap-" + str(p_day) + "-" + str(p_month) + "-" + str(p_year) + "/"
+    p_url = "/training-" + str(p_day) + "-" + str(p_month) + "-" + str(p_year) + "/"
     return redirect(p_url)
 
 
@@ -401,8 +402,8 @@ def delete_training(id,day,month,year):
 
 
 @ login_required
-@ routes.route('/training-<id>-<timeofday>-<day>-<month>-<year>/')
-def show_training(id,timeofday,day,month,year):
+@ routes.route('/training-<id>-day>-<month>-<year>/')
+def show_training(id,day,month,year):
     training = Training.query.filter_by(id=id).first()
 
     return render_template('training.html', training=training, user=current_user)

@@ -1,7 +1,7 @@
-from routes import * 
+from .routes import * 
 from . import db
 from datetime import datetime as dt
-from models import *
+from .models import *
 
 """ def add_to_db():
     raw_main = request.form['main']

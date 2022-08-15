@@ -1,6 +1,7 @@
 from flask_login import UserMixin
 from . import db
-from datetime import date
+import datetime
+
 
 
 class User(db.Model, UserMixin):
@@ -29,7 +30,7 @@ class Training(db.Model, UserMixin):
 
 
     timeofday = db.Column(db.String(50))
-    training_date = db.Column(db.Datetime) 
+    training_date = db.Column(db.DateTime) 
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     sections = db.relationship('TrainingSection', backref='training')
