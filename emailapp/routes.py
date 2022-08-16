@@ -224,12 +224,17 @@ def training_day(year, month, day):
 
     # how many days ago
     date_obj = dt(int(year),int(month),int(day))
-    todays_date = dt(dt.now().year,dt.now().month, dt.now().day)
+    todays_date = dt(int(year),int(month),int(day))
     diff_obj = todays_date - date_obj
     diff_in_days = diff_obj.days
 
 
     # making variables for ap and ip and a list of other trainings for this current day
+    #for t in current_user.trainings:
+        #print(f"%%%%%%%%%% {t.training_date} %%%%%%%%%")
+    
+    print(f"%%%%%%%%%% {todays_date} %%%%%%%%%")
+
     trainings = []
     # adding todays trainings 
     for t in current_user.trainings:
