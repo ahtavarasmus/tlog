@@ -180,6 +180,31 @@ def home():
 
 
 
+
+    # getting this month's trainings
+
+    # dict which looks like this {'ski':90,'rh':200}
+    categories = {}
+    # dict which looks like this {'pk':90,'vk':15}
+    intensities = {}
+
+
+    for month in current_user.months:
+        if month == current_month_int:
+            for training in month.trainings:
+                for section in training.sections:
+                    if section.category != categories:
+                        categories[section.category.name] = section.time
+                    else:
+                        categories[section.category.name] += section.time
+                    if section.intensity != intensities:
+                        intensities[section.intensity] = section.time
+                    else:
+                        intensities[section.intensity] += section.time
+
+
+
+
     if request.method == 'POST':
         year = request.form['year']
         month = dt.strptime(request.form['month'], "%B").month
@@ -211,8 +236,50 @@ def home():
     tcats=tcats,
     cat_colors=cat_colors,
     max=17000,
-    int_set=zip(ti_times,tints,int_colors)
+    int_set=zip(ti_times,tints,int_colors),
+    intetensites=intensities,
+    categories=categories
     )
+
+
+@login_required
+@routes.route("/summary-<cur_month>-<cur_year>/", methods=['GET'])
+def summary(cur_month, cur_year):
+ 
+    # dict which looks like this {'ski':90,'rh':200}
+    categories = {}
+    # dict which looks like this {'pk':90,'vk':15}
+    intensities = {}
+
+    print("%%%%%%%%5",cur_month, "%%%%%%%%5")
+    print("%%%%%%%%5",cur_year, "%%%%%%%%5")
+
+
+    print("€€€€€€5",current_user.years, "€€€€€€€5")
+    for year in current_user.years:
+
+        if year == cur_year:
+            for month in current_user.months:
+                if month == cur_month:
+                    for training in month.trainings:
+                        for section in training.sections:
+                            if section.category != categories:
+                                categories[section.category.name] = section.time
+                            else:
+                                categories[section.category.name] += section.time
+                            if section.intensity != intensities:
+                                intensities[section.intensity] = section.time
+                            else:
+                                intensities[section.intensity] += section.time
+
+    return render_template("month_summary.html",     
+            user=current_user,
+            intensities=intensities,
+            categories=categories
+            )
+
+   
+
 
 @login_required
 @routes.route("/training-<day>-<month>-<year>/", methods=['POST', 'GET'])
@@ -233,7 +300,6 @@ def training_day(year, month, day):
     #for t in current_user.trainings:
         #print(f"%%%%%%%%%% {t.training_date} %%%%%%%%%")
     
-    print(f"%%%%%%%%%% {todays_date} %%%%%%%%%")
 
     trainings = []
     # adding todays trainings 

@@ -33,6 +33,7 @@ class Training(db.Model, UserMixin):
     training_date = db.Column(db.DateTime) 
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    month_id = db.Column(db.Integer, db.ForeignKey('month.id'))
     sections = db.relationship('TrainingSection', backref='training')
 
     def __repr__(self):
@@ -80,6 +81,8 @@ class Month(db.Model, UserMixin):
 
     year_id = db.Column(db.Integer, db.ForeignKey('year.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    trainings = db.relationship("Training", backref="month")
 
     training_categories = db.relationship('MonthsTrainingCategory', backref='month')
     training_intensities = db.relationship('MonthsCategorysIntensity', backref='month')

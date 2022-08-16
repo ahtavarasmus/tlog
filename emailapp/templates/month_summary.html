@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}training moi{% endblock %}
+
+{% if user.is_authenticated %}
+{% block content %}
+
+<h3> Categories </h3>
+{% for category, time in categories.items() %}
+	<li>{{category}}: {{time}}</li>
+{% endfor %}
+<h3> Intensities </h3>
+{% for intensity, time in intensities.items() %}
+	<li>{{intensity}}: {{time}}</li>
+{% endfor %}
+
+
+
+
+
+
+{% endblock %}
+{% endif %}

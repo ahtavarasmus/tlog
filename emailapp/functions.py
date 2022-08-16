@@ -145,9 +145,15 @@ def add_training_to_db(raw_main,day,month,year):
 
     # getting existing category objects
     ecategories = current_user.categories
+
+
+
     # if no, redirect to making some categories first
     if ecategories == []:
         return redirect(url_for('routes.settings'))
+
+
+
     
     # making a list of category names
     cat_names = []
@@ -186,6 +192,9 @@ def add_training_to_db(raw_main,day,month,year):
         # commiting section_obj
         db.session.add(section_obj)
         db.session.commit()
+
+
+
         # checking if there's an existing year object
         year_found = False
         for item in current_user.years:
@@ -195,8 +204,13 @@ def add_training_to_db(raw_main,day,month,year):
         if not year_found:
             year_obj = Year(user=current_user, num=int(year))
 
+        print("#######", year_obj.num, "#######")
+
         db.session.add(year_obj)
         db.session.commit()
+
+
+
 
         # checking if there's an existing month object
         month_found = False
@@ -210,6 +224,14 @@ def add_training_to_db(raw_main,day,month,year):
 
         db.session.add(month_obj)
         db.session.commit()
+
+
+
+        # adding new_training to month_obj category
+        new_training.month = month_obj
+
+
+
         
         # adding everything also to Month objects summary
         mtc_found = False
