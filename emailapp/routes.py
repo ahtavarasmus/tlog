@@ -272,22 +272,27 @@ def summary(cur_month, cur_year):
     print("%%%%%%%%5",cur_year, "%%%%%%%%5")
 
 
-    print("€€€€€€5",current_user.years, "€€€€€€€5")
     for year in current_user.years:
-
-        if year == cur_year:
-            for month in current_user.months:
-                if month == cur_month:
+        if year.num == int(cur_year):
+            for month in year.months:
+                if month.num == int(cur_month):
                     for training in month.trainings:
                         for section in training.sections:
-                            if section.category != categories:
-                                categories[section.category.name] = section.time
-                            else:
+
+                            if section.category in categories.keys():
+                                print("UPDATING CATEGORY!!!!")
                                 categories[section.category.name] += section.time
-                            if section.intensity != intensities:
-                                intensities[section.intensity] = section.time
                             else:
+                                categories[section.category.name] = section.time
+                                print("FIRST ONE IN CATEGORY!!!!!")
+
+                                categories[section.category.name] += section.time
+                            if section.intensity in intensities.keys():
+                                print("UPDATING INTENSITY!!!!")
                                 intensities[section.intensity] += section.time
+                            else:
+                                print("FIRST ONE IN INTENSITY!!!!!")
+                                intensities[section.intensity] = section.time
 
     return render_template("month_summary.html",     
             user=current_user,
