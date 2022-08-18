@@ -279,14 +279,13 @@ def summary(cur_month, cur_year):
                     for training in month.trainings:
                         for section in training.sections:
 
-                            if section.category in categories.keys():
+                            if section.category.name in categories.keys():
                                 print("UPDATING CATEGORY!!!!")
                                 categories[section.category.name] += section.time
                             else:
                                 categories[section.category.name] = section.time
                                 print("FIRST ONE IN CATEGORY!!!!!")
 
-                                categories[section.category.name] += section.time
                             if section.intensity in intensities.keys():
                                 print("UPDATING INTENSITY!!!!")
                                 intensities[section.intensity] += section.time
