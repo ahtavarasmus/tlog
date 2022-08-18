@@ -13,7 +13,6 @@ from dotenv import load_dotenv
 from calendar import monthrange
 from flask import session
 import calendar, email, imaplib, os, re, time
-from .functions import add_training_to_db
 
 
 load_dotenv()
@@ -25,6 +24,87 @@ password = os.getenv("GMAIL_PASSWORD")
 gmail_host = 'imap.gmail.com'
 
 
+
+def add_training_to_db(raw_main,day,month,year):
+
+    # training_date = day + ' ' + month + ' ' + year 
+    training_date = dt(int(year),int(month),int(day))
+
+    # extracting the timeofday from the front
+    timeofday, main = raw_main.split()
+
+    # making the training object
+    new_training = Training(user=current_user, name=raw_main, timeofday=timeofday,training_date=training_date)
+    try:
+        db.session.add(new_training)
+        db.session.commit()
+    except:
+        return 'There was an arror adding training to db'
+
+    # checking which section had the most time so i can name the whole training by it
+    leading_sec = 0
+
+    # splitting training into parts
+    sections = main.split('+')
+    for section in sections:
+        ttype, intensity, ttime = section.split(',')
+        section_obj = TrainingSection(user=current_user,name=ttype)
+
+        if int(ttime) > leading_sec:
+            new_training.name = ttype
+            leading_sec = int(ttime)
+
+        found = False
+        for c in current_user.categories:
+            if c.name == ttype:
+                category_obj = c
+                found = True
+        if not found:
+            category_obj = Category(name=ttype,user=current_user)
+            db.session.add(category_obj)
+            db.session.commit()
+
+        section_obj.category = category_obj
+
+        # assigning intensity
+        section_obj.intensity = intensity
+        section_obj.time = ttime
+        section_obj.training = new_training
+
+        # commiting section_obj
+        db.session.add(section_obj)
+        db.session.commit()
+
+    found = False
+    print("MMMMMMMM", current_user.years, "EEEEEEEEEE")
+    for y in current_user.years:
+        if y.num == int(year):
+            year_obj = y
+            found = True
+    if not found:
+        year_obj = Year(user=current_user, num=int(year))
+        db.session.add(year_obj)
+        db.session.commit()
+
+    new_training.year = year_obj
+    
+    found = False
+    for m in current_user.months:
+        if m.num == int(month):
+            month_obj = m
+            found = True
+    if not found:
+        month_obj = Month(user=current_user, num=int(month), name=training_date.strftime("%B"),year=year_obj)
+        db.session.add(month_obj)
+        db.session.commit()
+
+    new_training.month = month_obj
+
+    try:
+        db.session.add(new_training)
+        db.session.commit()
+    except:
+        return "failed adding a new_training to db"       
 
 def send_emails():
     today = dt.today()
@@ -149,61 +229,6 @@ def home():
     fill_next_month = [item for item in range(1, DaysLeftToFill + 1)] 
 
     
-    # finding right month and year. also cats and ints
-    tcats = []
-    raw_tints = []
-    for mon in current_user.months:
-        if mon.year.num == current_year and mon.num == current_month_int:
-            tcats = (mon.training_categories)
-            raw_tints = (mon.training_intensities)
-    # removing duplicates
-    tints = list(dict.fromkeys(raw_tints))
-    # Category - Time - Chart
-    c_times = []
-    for tc in tcats:
-        time_tracker = 0
-        for i in tc.intensities:
-            time_tracker += int(i.overall_time)
-        c_times.append(time_tracker)
-    tc_times = (c_times)
-    # Intensity - Time - Chart
-    i_times = []
-
-    for i in tints:
-        i_times.append(int(i.overall_time))
-    ti_times = ( i_times )
-
-    colorpalette = ["#003f5c","#2f4b7c","#665191","#a05195","#d45087","#f95d6a","#ff7c43","#ffa600"]
-    cat_colors = ( colorpalette[:len(tcats)] )
-    int_colors = ( colorpalette[:len(tints)] )
-
-
-
-
-
-    # getting this month's trainings
-
-    # dict which looks like this {'ski':90,'rh':200}
-    categories = {}
-    # dict which looks like this {'pk':90,'vk':15}
-    intensities = {}
-
-
-    for month in current_user.months:
-        if month == current_month_int:
-            for training in month.trainings:
-                for section in training.sections:
-                    if section.category != categories:
-                        categories[section.category.name] = section.time
-                    else:
-                        categories[section.category.name] += section.time
-                    if section.intensity != intensities:
-                        intensities[section.intensity] = section.time
-                    else:
-                        intensities[section.intensity] += section.time
-
-
-
 
     if request.method == 'POST':
         year = request.form['year']
@@ -230,15 +255,7 @@ def home():
     days_in_month=days_in_month,
     list_of_days=list_of_days,
     fill_last_month=fill_last_month,
-    fill_next_month=fill_next_month,
-    cat_set=zip(tc_times,tcats,cat_colors),
-    tc_times=tc_times,
-    tcats=tcats,
-    cat_colors=cat_colors,
-    max=17000,
-    int_set=zip(ti_times,tints,int_colors),
-    intetensites=intensities,
-    categories=categories
+    fill_next_month=fill_next_month
     )
 
 
@@ -435,40 +452,14 @@ def next_day(day,month,year):
 @ routes.route('/delete-training-<id>-<day>-<month>-<year>/')
 def delete_training(id,day,month,year):
     training = Training.query.filter_by(id=id).first()
-    for section in training.sections:
-        # removing also from the month and it's followers
-        for year_obj in current_user.years:
-            if year_obj.num == int(year):
-                for month_obj in year_obj.months:
-                    if month_obj.num == int(month):
-                        m_obj = month_obj
-                        break
-        # looping over training_intensities to find what to delete
-        for ti in m_obj.training_intensities:
-            # finding the correspondent sections name so they match
-            if ti.name == section.intensity:
-                # just making sure it's really int 
-                etime = int(ti.overall_time)
-                etime -= int(section.time)
-                ti.overall_time = etime
 
-                # if no time on that intensity obj, let's delete it
-                if int(ti.overall_time) <= 0:
-                    db.session.delete(ti)
-                    db.session.commit()
-                else:
-                    # saving changes
-                    db.session.add(ti)
-                    db.session.commit()
-        
-        # finally deleting the section itself
+    for section in training.sections:
         db.session.delete(section)
         db.session.commit()
-
-
-    backurl = '/training-' + day + '-' + month + '-' + year + '/'
     db.session.delete(training)
     db.session.commit()
+
+    backurl = '/training-' + day + '-' + month + '-' + year + '/'
     return redirect(backurl)
 
 
