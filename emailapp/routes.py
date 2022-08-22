@@ -8,6 +8,8 @@ from . import db,mail
 from datetime import datetime as dt
 import datetime
 
+from twilio.twiml.messaging_response import MessagingResponse
+
 from dotenv import load_dotenv
 
 from calendar import monthrange
@@ -292,7 +294,11 @@ def summary(cur_month, cur_year):
                             else:
                                 print("FIRST ONE IN INTENSITY!!!!!")
                                 intensities[section.intensity] = section.time
+    for c in categories.keys():
+        categories[c] = round(categories[c] / 60, 1)
 
+    for i in intensities.keys():
+        intensities[i] = round(intensities[i] / 60, 1)
     return render_template("month_summary.html",     
             user=current_user,
             intensities=intensities,
@@ -388,6 +394,7 @@ def settings():
         """ else:
             new_category = request.form['new_category']
             new_category_obj = Category(user=current_user, name=new_category)
+
             try:
                 db.session.add(new_category_obj) 
                 db.session.commit()
@@ -396,6 +403,46 @@ def settings():
  """
         return redirect(url_for('routes.settings'))
     return render_template('settings.html', user=current_user, ecategories=ecategories, phone_number=phone_number)
+
+    
+
+@routes.route("/sms-webhook/", methods=['GET','POST'])
+def incoming_sms():
+    """Respond with the number of text messages sent between two parties."""
+    # Sender's phone number
+    from_number = request.values.get('From')
+    user = User.query.filter_by(phone_number=from_number).first()
+
+    # if user wasn't found return
+    if user is None:
+        return ('', 204)
+
+   
+    # Date of the incoming message
+    year = dt.today().year
+    month = dt.today().month
+    day = dt.today().day
+
+    # Body of the message
+    body = request.values.get('Body',None)
+    print("HELLO")
+
+    add_training_to_db(body, day, month, year)
+
+
+    # Creating the reply
+    message = 'Training: "{}" added to {}\'s tlog with date {}.{}.{}'\
+            .format(body,name,day,month,year)
+
+    # Put it in a TwiML response
+    resp = MessagingResponse()
+    resp.message(message)
+
+    return str(resp)
+
+
+
+
 
 @routes.route("/previous-year-<curryear>/")
 def previous_year(curryear):
