@@ -269,6 +269,7 @@ def summary(cur_month, cur_year):
     categories = {}
     # dict which looks like this {'pk':90,'vk':15}
     intensities = {}
+    month_overall = 0
 
     print("%%%%%%%%5",cur_month, "%%%%%%%%5")
     print("%%%%%%%%5",cur_year, "%%%%%%%%5")
@@ -280,7 +281,7 @@ def summary(cur_month, cur_year):
                 if month.num == int(cur_month):
                     for training in month.trainings:
                         for section in training.sections:
-
+                            month_overall += section.time
                             if section.category.name in categories.keys():
                                 print("UPDATING CATEGORY!!!!")
                                 categories[section.category.name] += section.time
@@ -299,10 +300,14 @@ def summary(cur_month, cur_year):
 
     for i in intensities.keys():
         intensities[i] = round(intensities[i] / 60, 1)
+
+    month_overall = round(month_overall / 60, 1)
+
     return render_template("month_summary.html",     
             user=current_user,
             intensities=intensities,
-            categories=categories
+            categories=categories,
+            month_overall=month_overall
             )
 
    
