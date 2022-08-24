@@ -27,7 +27,7 @@ gmail_host = 'imap.gmail.com'
 
 
 
-def add_training_to_db(raw_main,day,month,year):
+def add_training_to_db(user, raw_main,day,month,year):
 
     # training_date = day + ' ' + month + ' ' + year 
     training_date = dt(int(year),int(month),int(day))
@@ -36,7 +36,7 @@ def add_training_to_db(raw_main,day,month,year):
     timeofday, main = raw_main.split()
 
     # making the training object
-    new_training = Training(user=current_user, name=raw_main, timeofday=timeofday,training_date=training_date)
+    new_training = Training(user=user, name=raw_main, timeofday=timeofday,training_date=training_date)
     try:
         db.session.add(new_training)
         db.session.commit()
@@ -50,19 +50,19 @@ def add_training_to_db(raw_main,day,month,year):
     sections = main.split('+')
     for section in sections:
         ttype, intensity, ttime = section.split(',')
-        section_obj = TrainingSection(user=current_user,name=ttype)
+        section_obj = TrainingSection(user=user,name=ttype)
 
         if int(ttime) > leading_sec:
             new_training.name = ttype
             leading_sec = int(ttime)
 
         found = False
-        for c in current_user.categories:
+        for c in user.categories:
             if c.name == ttype:
                 category_obj = c
                 found = True
         if not found:
-            category_obj = Category(name=ttype,user=current_user)
+            category_obj = Category(name=ttype,user=user)
             db.session.add(category_obj)
             db.session.commit()
 
@@ -78,25 +78,25 @@ def add_training_to_db(raw_main,day,month,year):
         db.session.commit()
 
     found = False
-    print("MMMMMMMM", current_user.years, "EEEEEEEEEE")
-    for y in current_user.years:
+    print("MMMMMMMM", user.years, "EEEEEEEEEE")
+    for y in user.years:
         if y.num == int(year):
             year_obj = y
             found = True
     if not found:
-        year_obj = Year(user=current_user, num=int(year))
+        year_obj = Year(user=user, num=int(year))
         db.session.add(year_obj)
         db.session.commit()
 
     new_training.year = year_obj
     
     found = False
-    for m in current_user.months:
+    for m in user.months:
         if m.num == int(month):
             month_obj = m
             found = True
     if not found:
-        month_obj = Month(user=current_user, num=int(month), name=training_date.strftime("%B"),year=year_obj)
+        month_obj = Month(user=user, num=int(month), name=training_date.strftime("%B"),year=year_obj)
         db.session.add(month_obj)
         db.session.commit()
 
@@ -120,7 +120,7 @@ def send_emails():
 def send_email():
     today = dt.today()
     mail.init_app(current_app)
-    msg = Message(f'{today.day}.{today.month}.{today.year} fill today:D', sender=username,recipients=[current_user.email])
+    msg = Message(f'{today.day}.{today.month}.{today.year} fill today:D', sender=username,recipients=[user.email])
     msg.body = 'What did you do today?:)'
     mail.send(msg)
 
@@ -135,7 +135,7 @@ def receive_email_body():
     mail.select("INBOX")
 
     #select specific mails
-    _, selected_mails = mail.search(None, f'(FROM {current_user.email})')
+    _, selected_mails = mail.search(None, f'(FROM {user.email})')
 
 
     for idx,num in enumerate(selected_mails[0].split()):
@@ -341,7 +341,7 @@ def training_day(year, month, day):
 
     if request.method == 'POST':
         raw_main = request.form['main']
-        add_training_to_db(raw_main,day,month,year)
+        add_training_to_db(current_user,raw_main,day,month,year)
         return redirect(URL)
 
     return render_template('training_day.html', 
@@ -414,9 +414,10 @@ def incoming_sms():
     user = User.query.filter_by(phone_number=from_number).first()
 
     # if user wasn't found return
-    if user is None:
-        return ('', 204)
+    #if user is None:
+    #    return ('', 204)
 
+    name = "Rasmus"
    
     # Date of the incoming message
     year = dt.today().year
@@ -427,7 +428,7 @@ def incoming_sms():
     body = request.values.get('Body',None)
     print("HELLO")
 
-    add_training_to_db(body, day, month, year)
+    add_training_to_db(user, body, day, month, year)
 
 
     # Creating the reply
