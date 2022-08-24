@@ -6,4 +6,6 @@ tlog is training diary where you can track your trainings.
 features:
 - calendar
 - add morning and noon trainings
+- be able to add trainings with sms
+- month summary on different intensities and overall time on each sport
 
