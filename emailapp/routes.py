@@ -202,6 +202,9 @@ def home():
     current_year = session['year']
         # current_year: int
     current_month_int = session['month']
+    real_month = (current_month_int == dt.now().month) 
+    real_year = (current_year == dt.now().year)
+    real_date = (real_month and real_year)
         # current_month_int: int
     current_month_name = calendar.month_name[current_month_int]
         # current_month_name: string
@@ -250,6 +253,7 @@ def home():
     return render_template('home.html',
     user=current_user,
     active_tag='active',
+    real_date=real_date,
     current_day=current_day,
     current_month_int=current_month_int,
     current_month_name=current_month_name,

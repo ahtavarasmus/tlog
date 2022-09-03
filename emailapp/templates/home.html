@@ -148,12 +148,14 @@
     {% endfor %}
     {% for daynum in list_of_days %}
     {% if daynum == current_day %}
+    {% if real_date %}
     <div style="background-color: rgb(44, 182, 247);color: #302e2e;" id="monthdays"> 
        <a href="/training-{{ daynum }}-{{ current_month_int }}-{{ current_year }}">
            
            {{daynum}}
        </a>  
     </div>
+    {% endif %}
     {% else %}
     <div id="monthdays"> 
        <a href="/training-{{ daynum }}-{{ current_month_int }}-{{ current_year }}">
