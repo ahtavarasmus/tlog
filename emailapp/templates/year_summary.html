@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Year moi{% endblock %}
+
+{% if user.is_authenticated %}
+{% block content %}
+
+<h3> Categories </h3>
+{% for category, time in categories.items() %}
+	<li>{{category}}: {{time}} h</li>
+{% endfor %}
+<h3> Intensities </h3>
+{% for intensity, time in intensities.items() %}
+	<li>{{intensity}}: {{time}} h</li>
+{% endfor %}
+
+<h3> YEAR OVERALL</h3>
+<li>{{ year_overall }} h</li>
+
+
+{% endblock %}
+{% endif %}

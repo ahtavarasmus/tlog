@@ -295,6 +295,7 @@ def summary(cur_month, cur_year):
                             else:
                                 print("FIRST ONE IN INTENSITY!!!!!")
                                 intensities[section.intensity] = section.time
+
     for c in categories.keys():
         categories[c] = round(categories[c] / 60, 1)
 
@@ -310,7 +311,49 @@ def summary(cur_month, cur_year):
             month_overall=month_overall
             )
 
-   
+@login_required
+@routes.route("/year-<cur_year>/", methods=['POST', 'GET'])
+def year_summary(cur_year):
+    
+    year_overall = 0
+    categories = {}
+    intensities = {}
+ 
+    for year in current_user.years:
+        if year.num == int(cur_year):
+            for month in year.months:
+                for training in month.trainings:
+                    for section in training.sections:
+                        year_overall += section.time
+                        if section.category.name in categories.keys():
+                            print("UPDATING CATEGORY!!!!")
+                            categories[section.category.name] += section.time
+                        else:
+                            categories[section.category.name] = section.time
+                            print("FIRST ONE IN CATEGORY!!!!!")
+
+                        if section.intensity in intensities.keys():
+                            print("UPDATING INTENSITY!!!!")
+                            intensities[section.intensity] += section.time
+                        else:
+                            print("FIRST ONE IN INTENSITY!!!!!")
+                            intensities[section.intensity] = section.time
+
+    for c in categories.keys():
+        categories[c] = round(categories[c] / 60, 1)
+
+    for i in intensities.keys():
+        intensities[i] = round(intensities[i] / 60, 1)
+
+    year_overall = round(year_overall / 60, 1)
+
+    return render_template("year_summary.html",     
+            user=current_user,
+            intensities=intensities,
+            categories=categories,
+            year_overall=year_overall
+            )
+
 
 
 @login_required
@@ -502,7 +545,7 @@ def next_day(day,month,year):
     session['year'] = n_year
     session['month'] = n_month
     session['day'] = n_day
-    n_url = "/training-ap-" + str(n_day) + "-" + str(n_month) + "-" + str(n_year) + "/"
+    n_url = "/training-" + str(n_day) + "-" + str(n_month) + "-" + str(n_year) + "/"
     return redirect(n_url)
 
 @ login_required

@@ -123,7 +123,8 @@
             <br>
             <a href="/previous-year-{{ current_year }}" method='POST'> &#10094;</a>
         </li>
-	<li><a href="/summary-{{current_month_int}}-{{current_year}}/">{{ current_month_name }}<br><span style="font-size:18px">{{ current_year }}</span></a></li>
+        <li><a href="/summary-{{current_month_int}}-{{current_year}}/">{{ current_month_name }}<br></a>
+        <a href="/year-{{current_year}}/"><span style="font-size:18px">{{ current_year }}</span></a></li>
         <li class="next">
             <a href="/next-month-{{ current_month_int }}" method='POST'> &#10095;</a>
             <br>
