@@ -1,8 +1,13 @@
 {% extends 'base.html' %}
-{% block title %}training moi{% endblock %}
+{% block title %}{{name}} {{year}}{% endblock %}
 
 {% if user.is_authenticated %}
 {% block content %}
+
+<a href="/previous-month-routes.month_summary/" method='POST'> &#10094;</a>
+<h2>{{ name }} {{ year }}</h2>
+<a href="/next-month-routes.month_summary/" method='POST'> &#10095;</a>
+<br>
 
 <h3> Categories </h3>
 {% for category, time in categories.items() %}

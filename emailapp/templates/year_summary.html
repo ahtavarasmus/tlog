@@ -4,6 +4,10 @@
 {% if user.is_authenticated %}
 {% block content %}
 
+<a href="/previous-year-routes.year_summary/" method='POST'> &#10094;</a>
+<h2>Season {{ season }}</h2>
+<a href="/next-year-routes.year_summary/" method='POST'> &#10095;</a>
+<br>
 <h3> Categories </h3>
 {% for category, time in categories.items() %}
 	<li>{{category}}: {{time}} h</li>
@@ -14,7 +18,7 @@
 {% endfor %}
 
 <h3> YEAR OVERALL</h3>
-<li>{{ year_overall }} h</li>
+<li>{{ overall }} h</li>
 
 
 {% endblock %}

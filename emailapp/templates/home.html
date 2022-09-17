@@ -103,7 +103,7 @@
         padding: 5px;
         background: #1abc9c;
         color: white !important
-        }
+m        }
 
         #monthdays {
             background-color: #302e2e;
@@ -119,18 +119,21 @@
 <div class="month">
     <ul>
         <li class="prev">
-            <a href="/previous-month-{{ current_month_int }}" method='POST'> &#10094;</a>
+            <a href="/previous-month-routes.home/" method='POST'> &#10094;</a>
             <br>
-            <a href="/previous-year-{{ current_year }}" method='POST'> &#10094;</a>
+            <a href="/previous-year-routes.home/" method='POST'> &#10094;</a>
         </li>
-        <li><a href="/summary-{{current_month_int}}-{{current_year}}/">{{ current_month_name }}<br></a>
-        <a href="/year-{{current_year}}/"><span style="font-size:18px">{{ current_year }}</span></a></li>
+
+        <li><a href="/month-summary/">{{ current_month_name }}<br></a>
+        <a href="/year-summary/"><span style="font-size:18px">{{ current_year }}</span></a>
+        </li>
         <li class="next">
-            <a href="/next-month-{{ current_month_int }}" method='POST'> &#10095;</a>
+            <a href="/next-month-routes.home/" method='POST'> &#10095;</a>
             <br>
-            <a href="/next-year-{{ current_year }}" method='POST'> &#10095;</a>
+            <a href="/next-year-routes.home/" method='POST'> &#10095;</a>
         </li>
     </ul>
+    <a href="/reset-to-home/" method="POST">Reset date to today</a>
 </div>
 <ul class="weekdays">
     <li>Mo</li>

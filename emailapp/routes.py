@@ -266,8 +266,8 @@ def home():
 
 
 @login_required
-@routes.route("/summary-<cur_month>-<cur_year>/", methods=['GET'])
-def summary(cur_month, cur_year):
+@routes.route("/month-summary/", methods=['GET'])
+def month_summary():
  
     # dict which looks like this {'ski':90,'rh':200}
     categories = {}
@@ -275,14 +275,16 @@ def summary(cur_month, cur_year):
     intensities = {}
     month_overall = 0
 
-    print("%%%%%%%%5",cur_month, "%%%%%%%%5")
-    print("%%%%%%%%5",cur_year, "%%%%%%%%5")
 
+    cur_month = session['month']
+    cur_year = session['year']
+    
 
     for year in current_user.years:
         if year.num == int(cur_year):
             for month in year.months:
                 if month.num == int(cur_month):
+                    name = month.name
                     for training in month.trainings:
                         for section in training.sections:
                             month_overall += section.time
@@ -306,42 +308,72 @@ def summary(cur_month, cur_year):
     for i in intensities.keys():
         intensities[i] = round(intensities[i] / 60, 1)
 
+    name=dt(int(cur_year),int(cur_month),1).strftime("%B") # name of the month
+
+
     month_overall = round(month_overall / 60, 1)
 
     return render_template("month_summary.html",     
             user=current_user,
             intensities=intensities,
             categories=categories,
-            month_overall=month_overall
+            month_overall=month_overall,
+            name=name,
+            year=cur_year,
+            month=cur_month
             )
 
 @login_required
-@routes.route("/year-<cur_year>/", methods=['POST', 'GET'])
-def year_summary(cur_year):
+@routes.route("/year-summary/", methods=['POST', 'GET'])
+def year_summary():
     
-    year_overall = 0
+    overall = 0
     categories = {}
     intensities = {}
+    cur_year = session['year']
+    
+    
+    months_in = {}
+    if current_user.year_start > current_user.year_end: # we need two maps
+         
+        prev_year_months = [*range(current_user.year_start,13)] #includes year_start->13 including start month
+        next_year_months = [*range(1,current_user.year_end)] #includes 1->year-end but not including the end month
+        clicked_month = session['month']
+        c_year = int(cur_year)
+        n_year = int(cur_year)+1
+
+        if clicked_month in next_year_months:
+            n_year = int(cur_year)
+            c_year = int(cur_year)-1
+        months_in[c_year] = prev_year_months
+        months_in[n_year] = next_year_months 
+        season = str(c_year) + "-" + str(n_year)
+    else:
+        months_in[int(cur_year)] = [*range(current_user.year_start,current_user.year_end)]
+        season = cur_year
+
+
  
     for year in current_user.years:
-        if year.num == int(cur_year):
+        if year.num in months_in.keys():
             for month in year.months:
-                for training in month.trainings:
-                    for section in training.sections:
-                        year_overall += section.time
-                        if section.category.name in categories.keys():
-                            print("UPDATING CATEGORY!!!!")
-                            categories[section.category.name] += section.time
-                        else:
-                            categories[section.category.name] = section.time
-                            print("FIRST ONE IN CATEGORY!!!!!")
+                if month.num in months_in[year.num]:
+                    for training in month.trainings:
+                        for section in training.sections:
+                            overall += section.time
+                            if section.category.name in categories.keys():
+                                print("UPDATING CATEGORY!!!!")
+                                categories[section.category.name] += section.time
+                            else:
+                                categories[section.category.name] = section.time
+                                print("FIRST ONE IN CATEGORY!!!!!")
 
-                        if section.intensity in intensities.keys():
-                            print("UPDATING INTENSITY!!!!")
-                            intensities[section.intensity] += section.time
-                        else:
-                            print("FIRST ONE IN INTENSITY!!!!!")
-                            intensities[section.intensity] = section.time
+                            if section.intensity in intensities.keys():
+                                print("UPDATING INTENSITY!!!!")
+                                intensities[section.intensity] += section.time
+                            else:
+                                print("FIRST ONE IN INTENSITY!!!!!")
+                                intensities[section.intensity] = section.time
 
     for c in categories.keys():
         categories[c] = round(categories[c] / 60, 1)
@@ -349,13 +381,14 @@ def year_summary(cur_year):
     for i in intensities.keys():
         intensities[i] = round(intensities[i] / 60, 1)
 
-    year_overall = round(year_overall / 60, 1)
+    overall = round(overall / 60, 1)
 
     return render_template("year_summary.html",     
             user=current_user,
             intensities=intensities,
             categories=categories,
-            year_overall=year_overall
+            overall=overall,
+            season=season
             )
 
 
@@ -409,53 +442,23 @@ def training_day(year, month, day):
 def settings():
     ecategories = current_user.categories
     phone_number = current_user.phone_number
+    y_start = current_user.year_start
+    y_end = current_user.year_end
     if request.method == 'POST':
-        
-        """ if request.form['submit'] == 'send':
-            send_email()
-            return "Sent"
-        elif request.form['submit'] == 'receive':
-            message, day, month, year = receive_email_body()
-            # IAM ONLY DOING AP FOR NOW
-            timeofday = "ap"
-            add_training_to_db(message,timeofday,day,month,year)
-            return "Added to db"
-        elif request.form['submit'] == 'ski':
-            new_category_obj = Category(user=current_user, name='ski')
-            try:
-                db.session.add(new_category_obj) 
-                db.session.commit()
-            except:
-                return 'There was an error adding category to the db'
-        elif request.form['submit'] == 'run':
-            new_category_obj = Category(user=current_user, name='run')
-            try:
-                db.session.add(new_category_obj) 
-                db.session.commit()
-            except:
-                return 'There was an error adding category to the db'
-        elif request.form['submit'] == 'false':
-            current_user.in_email_list = False
-            db.session.commit()
-        elif request.form['submit'] == 'true':
-            current_user.in_email_list = True
-            db.session.commit() """
-        number = request.form['phonenumber']
-        current_user.phone_number = number
+        new_number = request.form['phonenumber']
+        year_start = request.form['year_start']
+        year_end = request.form['year_end']
+
+        current_user.year_start = year_start
+        current_user.year_end = year_end
+        current_user.phone_number = new_number
         db.session.commit()
-        """ else:
-            new_category = request.form['new_category']
-            new_category_obj = Category(user=current_user, name=new_category)
-
-            try:
-                db.session.add(new_category_obj) 
-                db.session.commit()
-            except:
-                return 'There was an error adding category to the db'
- """
         return redirect(url_for('routes.settings'))
-    return render_template('settings.html', user=current_user, ecategories=ecategories, phone_number=phone_number)
-
+    return render_template('settings.html', user=current_user,
+            ecategories=ecategories, 
+            phone_number=phone_number,
+            year_start=y_start,
+            year_end=y_end)
     
 
 @routes.route("/sms-webhook/", methods=['GET','POST'])
@@ -497,37 +500,35 @@ def incoming_sms():
 
 
 
-@routes.route("/previous-year-<curryear>/")
-def previous_year(curryear):
-    curryear = int(curryear)
-    session['year'] = curryear - 1
-    return redirect(url_for('routes.home'))
+@routes.route("/previous-year-<where>/")
+def previous_year(where):
+    session['year'] = session['year'] - 1
+    return redirect(url_for(where))
 
-@routes.route("/next-year-<curryear>/")
-def next_year(curryear):
-    curryear = int(curryear)
-    session['year'] = curryear + 1
-    return redirect(url_for('routes.home'))
+@routes.route("/next-year-<where>/")
+def next_year(where):
+    session['year'] = session['year'] + 1
+    return redirect(url_for(where))
 
-@routes.route("previous-month-<currmonth>/")
-def previous_month(currmonth):
-    currmonth = int(currmonth)
+@routes.route("previous-month-<where>/")
+def previous_month(where):
+    currmonth = session['month']
     if (currmonth - 1) < 1:
         session['year'] = session['year'] - 1
         session['month'] = 12
     else:
         session['month'] = currmonth - 1
-    return redirect(url_for('routes.home'))
+    return redirect(url_for(where))
 
-@routes.route("/next-month-<currmonth>/")
-def next_month(currmonth):
-    currmonth = int(currmonth)
+@routes.route("/next-month-<where>/")
+def next_month(where):
+    currmonth = session['month']
     if (currmonth + 1) > 12:
         session['year'] = session['year'] + 1
         session['month'] = 1
     else:
         session['month'] = currmonth + 1
-    return redirect(url_for('routes.home'))
+    return redirect(url_for(where))
 
 @routes.route("/prevday-<day>-<month>-<year>/")
 def prev_day(day,month,year):
@@ -573,3 +574,11 @@ def show_training(id,day,month,year):
     training = Training.query.filter_by(id=id).first()
 
     return render_template('training.html', training=training, user=current_user)
+
+@login_required
+@routes.route('/reset-to-home/')
+def reset_to_home():
+    session['month'] = dt.now().month
+    session['year'] = dt.now().year
+    session['day'] = dt.now().day
+    return redirect(url_for('routes.home'))

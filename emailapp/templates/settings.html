@@ -23,12 +23,19 @@
     <br> -->
     
     <label for="phonenumber">Phone Number</label>
+    {% if phone_number != None %}
+    <input type="text" id="phonenumber" name="phonenumber" value="{{phone_number}}">
+    {% else %}
     <input type="text" id="phonenumber" name="phonenumber">
+    {% endif %}
     <button type="submit" name="submit" value="phonenumber">Add</button>
 
-
     <br>
-    <p> = {{ phone_number }}</p>
+    <br>
+    <label for="year_start">Year Summary Range</label>
+    <input type="text" id="year_start" name="year_start" value="{{year_start}}">
+    <input type="text" id="year_end" name="year_end" value="{{year_end}}">
+    <button type="submit" name="sumbit">Update</button>
 
 </form>
 {% endblock %}

@@ -11,6 +11,8 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(150))
     in_email_list = db.Column(db.Boolean, default=False)
     phone_number = db.Column(db.String(100))
+    year_start = db.Column(db.Integer, default=1)
+    year_end = db.Column(db.Integer, default=12)
     
     categories = db.relationship('Category', backref='user', lazy='select')
     trainings = db.relationship(
