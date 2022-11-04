@@ -26,6 +26,16 @@ password = os.getenv("GMAIL_PASSWORD")
 gmail_host = 'imap.gmail.com'
 
 
+def validate_training(raw):
+    if re.search("^..\s", raw) == None:
+        return False
+    _, raw = raw.split(" ") # removing the "ap "
+    sections = raw.split("+") # splitting from + multiple
+    for s in sections:
+        if re.search(".+\,.+\,\d\d", s) == None:
+            return False
+    
+    return True
 
 def add_training_to_db(user, raw_main,day,month,year):
 
@@ -107,88 +117,6 @@ def add_training_to_db(user, raw_main,day,month,year):
         db.session.commit()
     except:
         return "failed adding a new_training to db"       
-
-def send_emails():
-    today = dt.today()
-    mail.init_app(current_app)
-    for user in User.query.all():
-        if user.in_email_list:
-            msg = Message(f'Day {today.day}.{today.month}.{today.year} :D', sender=username,recipients=[user.email])
-            msg.body = 'What did you do today?:)'
-            mail.send(msg)
-
-def send_email():
-    today = dt.today()
-    mail.init_app(current_app)
-    msg = Message(f'{today.day}.{today.month}.{today.year} fill today:D', sender=username,recipients=[user.email])
-    msg.body = 'What did you do today?:)'
-    mail.send(msg)
-
-def receive_email_body():
-
-    mail = imaplib.IMAP4_SSL(gmail_host)
-
-    #login
-    mail.login(username, password)
-
-    #select inbox
-    mail.select("INBOX")
-
-    #select specific mails
-    _, selected_mails = mail.search(None, f'(FROM {user.email})')
-
-
-    for idx,num in enumerate(selected_mails[0].split()):
-        if idx != len(selected_mails[0].split())-1:
-           continue 
-        _, data = mail.fetch(num , '(RFC822)')
-        _, bytes_data = data[0]
-
-        #convert the byte data to message
-        email_message = email.message_from_bytes(bytes_data)
-
-        #access data
-        for part in email_message.walk():
-            if part.get_content_type()=="text/plain" or part.get_content_type()=="text/html":
-                message = part.get_payload(decode=True)
-                body_text = message.decode()
-                list_raw = re.split("\s.{2}\s\d\d",body_text,1)
-                message = list_raw[0]
-                days_date = re.search(".{2}\s\d\d[.]\s\w+[.]\s\d\d\d\d",body_text).group()
-                year = re.search("\d\d\d\d", days_date).group()
-                day = re.search("\d\d",days_date,1).group()
-                month_raw = re.search("\s\D+[.]",days_date).group()
-
-                if "tammi" in month_raw:
-                    month = "1" 
-                elif "helmi" in month_raw:
-                    month = "2"
-                elif "maalis" in month_raw:
-                    month = "3"
-                elif "huhti" in month_raw:
-                    month = "4"
-                elif "touko" in month_raw:
-                    month = "5"
-                elif "kesä" in month_raw:
-                    month = "6"
-                elif "heinä" in month_raw:
-                    month = "7"
-                elif "elo" in month_raw:
-                    month = "8"
-                elif "syys" in month_raw:
-                    month = "9"
-                elif "loka" in month_raw:
-                    month = "10"
-                elif "marras" in month_raw:
-                    month = "11"
-                elif "joulu" in month_raw:
-                    month = "12"
-
-                return message,day,month,year
-                break
-
-    return 'no messages:('
-
 
 
 @login_required
@@ -397,8 +325,6 @@ def year_summary():
 @routes.route("/training-<day>-<month>-<year>/", methods=['POST', 'GET'])
 def training_day(year, month, day):
 
-    # THINK ABOUT DO YOU EVEN NEED THESE MONTH AND YEAR CLASSES OKAY they are useful not having to load up summary everytime you open new month but you could remove them now and 
-    # implement those later if needed. RIGHT now figure out if you could just use datetime.date() to sort these trainings on their correct days and daytimes.
     URL = "/training-" + day + "-" + month + "-" + year + "/"
 
     # how many days ago
@@ -407,11 +333,6 @@ def training_day(year, month, day):
     diff_obj = todays_date - date_obj
     diff_in_days = diff_obj.days
 
-
-    # making variables for ap and ip and a list of other trainings for this current day
-    #for t in current_user.trainings:
-        #print(f"%%%%%%%%%% {t.training_date} %%%%%%%%%")
-    
 
     trainings = []
     # adding todays trainings 
@@ -426,7 +347,8 @@ def training_day(year, month, day):
 
     if request.method == 'POST':
         raw_main = request.form['main']
-        add_training_to_db(current_user,raw_main,day,month,year)
+        if validate_training(raw_main):
+            add_training_to_db(current_user,raw_main,day,month,year)
         return redirect(URL)
 
     return render_template('training_day.html', 
