@@ -6,6 +6,7 @@ from flask_mail import Mail
 import os
 import time
 from flask_crontab import Crontab
+import config
 
 crontab = Crontab()
 db = SQLAlchemy()
@@ -13,15 +14,15 @@ mail = Mail()
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = os.environ.get("TLOG_SECRET_KEY")
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///home/rasmus/tlog/emailapp/database.db'
+    app.config['SECRET_KEY'] = config.get("SECRET_KEY")
+    app.config['SQLALCHEMY_DATABASE_URI'] = config.get("SQLALCHEMY_DATABASE_URI")
 
     db.init_app(app)
     mail.init_app(app)
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'
     app.config['MAIL_PORT'] = 465
-    app.config['MAIL_USERNAME'] = os.environ.get("GMAIL_USER")
-    app.config['MAIL_PASSWORD'] = os.environ.get("GMAIL_PASSWORD")
+    app.config['MAIL_USERNAME'] = config.get("GMAIL_USER")
+    app.config['MAIL_PASSWORD'] = config.get("GMAIL_PASSWORD")
     app.config['MAIL_USE_TLS'] = False
     app.config['MAIL_USE_SSL'] = True
 
