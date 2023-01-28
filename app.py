@@ -2,7 +2,7 @@ from emailapp import create_app
 
 if __name__=='__main__':
     app = create_app()
+    print("HERE")
     app.run(debug=True)
 else:
     gunicorn_app = create_app()
-
