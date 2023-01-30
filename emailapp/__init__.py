@@ -8,7 +8,7 @@ import json
 import time
 from flask_crontab import Crontab
 
-with open('/home/rasmus/etc/config.json') as config_file:
+with open('/etc/config.json') as config_file:
     config = json.load(config_file)
 
 crontab = Crontab()
@@ -17,7 +17,7 @@ mail = Mail()
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = config.get('SECRET_KEY')
+    app.config['SECRET_KEY'] = "asdfasdf"
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:////home/rasmus/tlog/emailapp/prod_db.db"
 
     db.init_app(app)
