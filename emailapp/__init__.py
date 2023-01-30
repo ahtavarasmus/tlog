@@ -17,8 +17,8 @@ mail = Mail()
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = "asdfasdf"
-    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:////home/rasmus/tlog/emailapp/prod_db.db"
+    app.config['SECRET_KEY'] = config.get('SECRET_KEY') 
+    app.config['SQLALCHEMY_DATABASE_URI'] = config.get('SQLALCHEMY_DATABASE_URI')
 
     db.init_app(app)
     mail.init_app(app)
