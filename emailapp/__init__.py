@@ -38,16 +38,16 @@ def create_app():
     app.register_blueprint(auth, url_prefix='/')
     app.register_blueprint(routes, url_prefix='/')
 
-    create_database(app) 
-    
-    from .models import User 
+    create_database(app)
+
+    from .models import User
 
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
 
     @app.cli.command()
-    def scheduled():
+    def scheduled(): 
         """Run scheduled job."""
         print('Importing feeds...')
         time.sleep(5)
@@ -60,7 +60,7 @@ def create_app():
         return User.query.get(int(id))
     return app
 
-def create_database(app):
-    if not path.exists('emailapp/database.db'):
-        db.create_all(app=app)
-        print('CREATED THE DATABASE.')
+    def create_database(app):
+        if not path.exists('emailapp/database.db'):
+            db.create_all(app=app)
+            print('CREATED THE DATABASE.')
