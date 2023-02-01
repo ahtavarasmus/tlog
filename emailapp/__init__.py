@@ -61,6 +61,6 @@ def create_app():
     return app
 
 def create_database(app):
-    if not path.exists('emailapp/database.db'):
+    if not path.exists('emailapp/prod_db.db'):
         db.create_all(app=app)
         print('CREATED THE DATABASE.')
