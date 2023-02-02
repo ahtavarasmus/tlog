@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager 
+from flask_login import LoginManager
 from os import path
 from flask_mail import Mail
 import os
@@ -15,9 +15,10 @@ crontab = Crontab()
 db = SQLAlchemy()
 mail = Mail()
 
+
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = config.get('SECRET_KEY') 
+    app.config['SECRET_KEY'] = config.get('SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = config.get('SQLALCHEMY_DATABASE_URI')
 
     db.init_app(app)
@@ -47,14 +48,13 @@ def create_app():
     login_manager.init_app(app)
 
     @app.cli.command()
-    def scheduled(): 
+    def scheduled():
         """Run scheduled job."""
         print('Importing feeds...')
         time.sleep(5)
         print('Users:', str(User.query.all()))
         print('Done!')
 
-    
     @login_manager.user_loader
     def load_user(id):
         return User.query.get(int(id))
@@ -64,6 +64,7 @@ def create_app():
         if not path.exists('emailapp/database.db'):
             db.create_all(app=app)
             print('CREATED THE DATABASE.')
+
 
 def create_database(app):
     if not path.exists('emailapp/prod_db.db'):

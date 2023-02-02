@@ -1,4 +1,6 @@
-#!/home/rasmus/tlog/venv/bin/python3
+#!/bin/sh
+'''exec' "/Users/ahtavarasmus/OneDrive - TUNI.fi/tlog_project/tlog/venv/bin/python" "$0" "$@"
+' '''
 # -*- coding: utf-8 -*-
 import re
 import sys
