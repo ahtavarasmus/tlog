@@ -2,7 +2,4 @@
 *.db
 venv/*
 venv/
-emailapp/__pycache__/*
-__pycache__/
-*.pyc
-emailapp/__pycache__/__init__.cpython-310.pyc
+*/__pycache__/*
