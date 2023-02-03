@@ -14,6 +14,7 @@ with open('/etc/config.json') as config_file:
 crontab = Crontab()
 db = SQLAlchemy()
 mail = Mail()
+DB_NAME = config.get('DB_NAME')
 
 def create_app():
     app = Flask(__name__)
@@ -39,7 +40,9 @@ def create_app():
     app.register_blueprint(auth, url_prefix='/')
     app.register_blueprint(routes, url_prefix='/')
 
-    create_database(app) 
+    if not path.exists(f'emailapp/{DB_NAME}'):
+        with app.app_context():
+            db.create_all()
     
     from .models import User 
 
@@ -61,7 +64,3 @@ def create_app():
         return User.query.get(int(id))
     return app
 
-def create_database(app):
-    if not path.exists('emailapp/prod_db.db'):
-        db.create_all(app=app)
-        print('CREATED THE DATABASE.')
