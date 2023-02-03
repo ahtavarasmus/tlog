@@ -22,6 +22,7 @@ def create_app():
 
     db.init_app(app)
     mail.init_app(app)
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'
     app.config['MAIL_PORT'] = 465
     app.config['MAIL_USERNAME'] = config.get("GMAIL_USER")
@@ -61,6 +62,6 @@ def create_app():
     return app
 
 def create_database(app):
-    if not path.exists('emailapp/database.db'):
+    if not path.exists('emailapp/prod_db.db'):
         db.create_all(app=app)
         print('CREATED THE DATABASE.')
