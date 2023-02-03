@@ -1,6 +1,8 @@
 *.env
 *.db
 venv/*
-*/__pycache__/*
+venv/
+emailapp/__pycache__/*
+__pycache__/
 *.pyc
 
