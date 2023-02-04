@@ -68,11 +68,13 @@ def add_training_to_db(user, raw_main,day,month,year):
         ttype, intensity, ttime = section.split(',')
         section_obj = TrainingSection(user=user,name=ttype)
 
-        if (int(ttime) > leading_sec and not jumping_training) \
-                or ttype == "jumping":
+        if int(ttime) > leading_sec and not jumping_training:
             new_training.name = ttype.capitalize()
             leading_sec = int(ttime)
+
+        if ttype == "jumping":
             jumping_training = True
+            new_training.name = ttype.capitalize()
 
         found = False
         for c in user.categories:

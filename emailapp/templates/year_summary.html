@@ -11,23 +11,29 @@
 <h3> Categories </h3>
 {% for category, time in categories.items() %}
 <ul>
-	<li>{{category}}: {{time}} h</li>
+    <li>{{category}}: {{time}} h</li>
 </ul>
 {% endfor %}
 <h3> Intensities </h3>
 {% for intensity, time in intensities.items() %}
 <ul>
-	<li>{{intensity}}: {{time}} h</li>
+    <li>{{intensity}}: {{time}} h</li>
 </ul>
 {% endfor %}
 <h3> Jumps </h3>
-<ul>
-    <li>{{jumps}} jumps</li>
-</ul>
+{% if jumps != 0 %}
+    <ul>
+        <li>{{jumps}} jumps</li>
+    </ul>
+{% endif %}
 <h3> YEAR OVERALL</h3>
 <ul>
     <li>{{ overall }} h</li>
+    {% if jumps != 0 %}
     <li>{{jumps}} jumps</li>
+    {% else %}
+    <li>0 jumps</li>
+    {% endif %}
 </ul>
 
 {% endblock %}
