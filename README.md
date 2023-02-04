@@ -6,6 +6,7 @@ tlog is training diary where you can track your trainings.
 http://tlog.training
 
 features:
+- account
 - calendar
 - add morning and noon trainings
 - be able to add trainings with sms
