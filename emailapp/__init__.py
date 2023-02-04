@@ -1,9 +1,9 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager 
+from flask_login import LoginManager
 from os import path
 from flask_mail import Mail
-import os
+from flask_migrate import Migrate
 import json
 import time
 from flask_crontab import Crontab
@@ -13,15 +13,18 @@ with open('/etc/config.json') as config_file:
 
 crontab = Crontab()
 db = SQLAlchemy()
+migrate = Migrate()
 mail = Mail()
 DB_NAME = config.get('DB_NAME')
 
+
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = config.get('SECRET_KEY') 
+    app.config['SECRET_KEY'] = config.get('SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = config.get('SQLALCHEMY_DATABASE_URI')
 
     db.init_app(app)
+    migrate.init_app(app, db)
     mail.init_app(app)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -43,8 +46,8 @@ def create_app():
     if not path.exists(f'emailapp/{DB_NAME}'):
         with app.app_context():
             db.create_all()
-    
-    from .models import User 
+
+    from .models import User
 
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
@@ -58,9 +61,7 @@ def create_app():
         print('Users:', str(User.query.all()))
         print('Done!')
 
-    
     @login_manager.user_loader
     def load_user(id):
         return User.query.get(int(id))
     return app
-

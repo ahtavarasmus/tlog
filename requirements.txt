@@ -1,3 +1,4 @@
+alembic==1.9.2
 blinker==1.4
 certifi==2022.6.15
 charset-normalizer==2.1.1
@@ -7,10 +8,12 @@ Flask==2.0.2
 flask-crontab==0.1.2
 Flask-Login==0.5.0
 Flask-Mail==0.9.1
+Flask-Migrate==4.0.4
 Flask-SQLAlchemy==2.5.1
 idna==3.3
 itsdangerous==2.0.1
 Jinja2==3.0.3
+Mako==1.2.4
 MarkupSafe==2.0.1
 PyJWT==2.4.0
 python-dotenv==0.20.0

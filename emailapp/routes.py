@@ -14,7 +14,12 @@ from dotenv import load_dotenv
 
 from calendar import monthrange
 from flask import session
-import calendar, email, imaplib, os, re, time
+import calendar
+import email
+import imaplib
+import os
+import re
+import time
 
 
 load_dotenv()
@@ -55,6 +60,7 @@ def add_training_to_db(user, raw_main,day,month,year):
 
     # checking which section had the most time so i can name the whole training by it
     leading_sec = 0
+    jumping_training = False
 
     # splitting training into parts
     sections = main.split('+')
@@ -62,9 +68,11 @@ def add_training_to_db(user, raw_main,day,month,year):
         ttype, intensity, ttime = section.split(',')
         section_obj = TrainingSection(user=user,name=ttype)
 
-        if int(ttime) > leading_sec:
-            new_training.name = ttype
+        if (int(ttime) > leading_sec and not jumping_training) \
+                or ttype == "jumping":
+            new_training.name = ttype.capitalize()
             leading_sec = int(ttime)
+            jumping_training = True
 
         found = False
         for c in user.categories:
@@ -79,7 +87,10 @@ def add_training_to_db(user, raw_main,day,month,year):
         section_obj.category = category_obj
 
         # assigning intensity
-        section_obj.intensity = intensity
+        if jumping_training:
+            section_obj.jumps = int(intensity)
+        else:
+            section_obj.intensity = intensity
         section_obj.time = ttime
         section_obj.training = new_training
 
@@ -201,6 +212,7 @@ def month_summary():
     categories = {}
     # dict which looks like this {'pk':90,'vk':15}
     intensities = {}
+    jumps = 0
     month_overall = 0
 
 
@@ -223,12 +235,15 @@ def month_summary():
                                 categories[section.category.name] = section.time
                                 print("FIRST ONE IN CATEGORY!!!!!")
 
-                            if section.intensity in intensities.keys():
-                                print("UPDATING INTENSITY!!!!")
-                                intensities[section.intensity] += section.time
+                            if section.category.name == "jumping":
+                                jumps += section.jumps
                             else:
-                                print("FIRST ONE IN INTENSITY!!!!!")
-                                intensities[section.intensity] = section.time
+                                if section.intensity in intensities.keys():
+                                    print("UPDATING INTENSITY!!!!")
+                                    intensities[section.intensity] += section.time
+                                else:
+                                    print("FIRST ONE IN INTENSITY!!!!!")
+                                    intensities[section.intensity] = section.time
 
     for c in categories.keys():
         categories[c] = round(categories[c] / 60, 1)
@@ -245,6 +260,7 @@ def month_summary():
             user=current_user,
             intensities=intensities,
             categories=categories,
+            jumps=jumps,
             month_overall=month_overall,
             name=name,
             year=cur_year,
@@ -258,6 +274,7 @@ def year_summary():
     overall = 0
     categories = {}
     intensities = {}
+    jumps = 0
     cur_year = session['year']
     
     
@@ -296,12 +313,15 @@ def year_summary():
                                 categories[section.category.name] = section.time
                                 print("FIRST ONE IN CATEGORY!!!!!")
 
-                            if section.intensity in intensities.keys():
-                                print("UPDATING INTENSITY!!!!")
-                                intensities[section.intensity] += section.time
+                            if section.category.name == "jumping":
+                                jumps += section.jumps
                             else:
-                                print("FIRST ONE IN INTENSITY!!!!!")
-                                intensities[section.intensity] = section.time
+                                if section.intensity in intensities.keys():
+                                    print("UPDATING INTENSITY!!!!")
+                                    intensities[section.intensity] += section.time
+                                else:
+                                    print("FIRST ONE IN INTENSITY!!!!!")
+                                    intensities[section.intensity] = section.time
 
     for c in categories.keys():
         categories[c] = round(categories[c] / 60, 1)
@@ -315,6 +335,7 @@ def year_summary():
             user=current_user,
             intensities=intensities,
             categories=categories,
+            jumps=jumps,
             overall=overall,
             season=season
             )

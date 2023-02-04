@@ -10,16 +10,25 @@
 <br>
 <h3> Categories </h3>
 {% for category, time in categories.items() %}
+<ul>
 	<li>{{category}}: {{time}} h</li>
+</ul>
 {% endfor %}
 <h3> Intensities </h3>
 {% for intensity, time in intensities.items() %}
+<ul>
 	<li>{{intensity}}: {{time}} h</li>
+</ul>
 {% endfor %}
-
+<h3> Jumps </h3>
+<ul>
+    <li>{{jumps}} jumps</li>
+</ul>
 <h3> YEAR OVERALL</h3>
-<li>{{ overall }} h</li>
-
+<ul>
+    <li>{{ overall }} h</li>
+    <li>{{jumps}} jumps</li>
+</ul>
 
 {% endblock %}
 {% endif %}
