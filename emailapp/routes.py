@@ -175,6 +175,17 @@ def home():
     DaysLeftToFill = 42 - days_in_month - len(fill_last_month)
     fill_next_month = [item for item in range(1, DaysLeftToFill + 1)] 
 
+
+    # getting dict of day as a key and value as how many trainings at that day
+    training_days_marks = set()
+    if current_user.is_authenticated:
+        for year in current_user.years:
+            if year.num == current_year:
+                for month in year.months:
+                    if month.num == current_month_int:
+                        name = month.name
+                        for training in month.trainings:
+                            training_days_marks.add(training.training_date)
     
 
     if request.method == 'POST':
@@ -203,7 +214,7 @@ def home():
     days_in_month=days_in_month,
     list_of_days=list_of_days,
     fill_last_month=fill_last_month,
-    fill_next_month=fill_next_month
+    fill_next_month=fill_next_month,
     )
 
 
