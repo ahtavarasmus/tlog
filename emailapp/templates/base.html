@@ -23,7 +23,7 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
-                <a href="/" class="navbar-brand">Rasmus's Training Diary</a>
+                <a href="/" class="navbar-brand">Tlog</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -35,7 +35,7 @@
                     <li class="nav-item"><a class="nav-link {{active_tag}}" href="{{ url_for('auth.logout') }}">Logout</a></li>
                     {% else %}
                     <li class="nav-item"><a class="nav-link {{active_tag}}" href="/login">Login</a></li>
-                    <li class="nav-item"><a class="nav-link {{active_tag}}" href="{{ url_for('auth.register') }}">Register</a></li>
+                    <li class="nav-item"><a class="nav-link {{active_tag}}" href="{{ url_for('auth.register') }}">Sign Up</a></li>
                     {% endif %}
                     </ul>
                 </div>

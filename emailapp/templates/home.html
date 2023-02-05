@@ -1,9 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Home{% endblock %}
 {% block content %}
-{% if user.is_authenticated %}
-<p>Logged in as {{ user.username }}</p>
-
 <head>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js'></script>
     <style>
@@ -113,9 +110,10 @@ m        }
             color: #302e2e;
         }
     </style>
-
 </head> 
-    
+
+{% if user.is_authenticated %}
+<p>Logged in as {{ user.username }}</p>
 <div class="month">
     <ul>
         <li class="prev">
@@ -133,7 +131,7 @@ m        }
             <a href="/next-year-routes.home/" method='POST'> &#10095;</a>
         </li>
     </ul>
-    <a href="/reset-to-home/" method="POST">Reset date to today</a>
+    <a href="/reset-to-home/" method="POST">Reset date</a>
 </div>
 <ul class="weekdays">
     <li>Mo</li>
@@ -175,30 +173,8 @@ m        }
     {% endfor %}
     
 </div>
-
-<div class="container text-center">
-    <div class="row">
-        <div class="col category-time">
-            {{ current_day }}
-        </div>
-        <div class="col category-time">
-            {% for tc_time, tcat, color in cat_set %}
-            <p>{{tcat.name}} : {{tc_time}}mins</p>
-            {% endfor %}
-        </div>
-        <div class="col intensity-time">
-            {% for ti_time, tint, color in int_set %}
-            <p>{{tint.name}} : {{ti_time}}mins</p>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-
-
-
-
 {% else %}
-<p>Not logged in.</p>
+<p>Not logged in</p>
 {% endif %}
 
 

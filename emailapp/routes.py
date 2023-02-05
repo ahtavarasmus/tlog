@@ -136,9 +136,10 @@ def add_training_to_db(user, raw_main,day,month,year):
 @routes.route('/')
 @routes.route('/home', methods=['POST', 'GET'])
 def home():
-
-    if not current_user.is_authenticated:
-        return redirect(url_for('auth.login'))
+    if 'year' not in session or 'month' not in session:
+        session['year'] = datetime.datetime.now().year
+        session['month'] = datetime.datetime.now().month
+        session['day'] = datetime.datetime.now().day
 
     current_year = session['year']
         # current_year: int
