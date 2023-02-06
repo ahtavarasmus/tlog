@@ -32,7 +32,9 @@
                     <li class="nav-item"><a class="nav-link {{ active_tag }}" href="{{ url_for('routes.home') }}">Home</a></li>
                     {% if user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link {{active_tag}}" href="{{ url_for('routes.settings') }}">Settings</a></li>
+                    <li class="nav-item"><a class="nav-link {{active_tag}}" href="{{ url_for('routes.help') }}">Help</a></li>
                     <li class="nav-item"><a class="nav-link {{active_tag}}" href="{{ url_for('auth.logout') }}">Logout</a></li>
+
                     {% else %}
                     <li class="nav-item"><a class="nav-link {{active_tag}}" href="/login">Login</a></li>
                     <li class="nav-item"><a class="nav-link {{active_tag}}" href="{{ url_for('auth.register') }}">Sign Up</a></li>

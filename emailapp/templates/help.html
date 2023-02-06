@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Tlog - Help{% endblock %}
+{% block content %}
+
+        <h3>How to add a training?</h3>
+        <ol>
+            <li>click on a day from the calendar (home page)</li>
+            <li>training format is "[am/pm] training_name,intensity_with_letters,time_in_minutes"
+                e.g.
+                <ul>
+                    <li>"am ski,pk,90" means skied 90min with intensity pk in the morning</li>
+                    <li>"pm run,pk,15+run,mk,10+run,pk,20" to make training with different speeds</li>
+                </ul>
+            </li>
+        </ol>
+        <h3>How to view month/year summary?</h3>
+        <ol>
+            <li>click on the month/year name from the home page</li>
+            <li>now open your eyes!</li>
+        </ol>
+        <h3>How to change the range of months included in year summary?</h3>
+        <ol>
+            <li>click "settings" from the menu</li>
+            <li>first part means starting month (inclusive)</li>
+            <li>second part means ending month (exclusive)</li>
+        <p>e.g. if i want the following months included: 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3<br>i can put "5" to first and "4" to second.</p>
+        </ol>
+
+{% endblock %}

@@ -216,6 +216,12 @@ def home():
     fill_last_month=fill_last_month,
     fill_next_month=fill_next_month,
     )
+    
+
+@login_required
+@routes.route("/help",methods=['GET'])
+def help():
+    return render_template("help.html",user=current_user)
 
 
 @login_required
@@ -280,6 +286,7 @@ def month_summary():
             year=cur_year,
             month=cur_month
             )
+
 
 @login_required
 @routes.route("/year-summary/", methods=['POST', 'GET'])
