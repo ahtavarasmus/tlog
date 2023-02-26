@@ -247,7 +247,8 @@ def month_summary():
                     name = month.name
                     for training in month.trainings:
                         for section in training.sections:
-                            month_overall += section.time
+                            if section.category.name != "jumping":
+                                month_overall += section.time
                             if section.category.name in categories.keys():
                                 print("UPDATING CATEGORY!!!!")
                                 categories[section.category.name] += section.time
@@ -326,7 +327,8 @@ def year_summary():
                 if month.num in months_in[year.num]:
                     for training in month.trainings:
                         for section in training.sections:
-                            overall += section.time
+                            if section.category.name != "jumping":
+                                overall += section.time
                             if section.category.name in categories.keys():
                                 print("UPDATING CATEGORY!!!!")
                                 categories[section.category.name] += section.time
