@@ -37,7 +37,7 @@ def validate_training(raw):
     _, raw = raw.split(" ") # removing the "ap "
     sections = raw.split("+") # splitting from + multiple
     for s in sections:
-        if re.search(".+\,.+\,\d\d", s) == None:
+        if re.search(".+\,.+\,\d+", s) == None:
             return False
     
     return True
