@@ -8,7 +8,7 @@ import json
 import time
 from flask_crontab import Crontab
 
-with open('/etc/config.json') as config_file:
+with open('/etc/tlog_config.json') as config_file:
     config = json.load(config_file)
 
 crontab = Crontab()

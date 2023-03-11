@@ -100,31 +100,32 @@ def add_training_to_db(user, raw_main,day,month,year):
         db.session.add(section_obj)
         db.session.commit()
 
-    found = False
-    print("MMMMMMMM", user.years, "EEEEEEEEEE")
-    for y in user.years:
-        if y.num == int(year):
-            year_obj = y
-            found = True
-    if not found:
+    print("-------", user.years, "----------")
+
+    # finding existing year object or making a new
+    try:
+        year_obj = db.session.execute(db.select(Year).filter_by(num=int(year),
+                        user_id=user.id)).scalar_one()
+    except:
         year_obj = Year(user=user, num=int(year))
         db.session.add(year_obj)
         db.session.commit()
 
     new_training.year = year_obj
-    
-    found = False
-    for m in user.months:
-        if m.num == int(month):
-            month_obj = m
-            found = True
-    if not found:
-        month_obj = Month(user=user, num=int(month), name=training_date.strftime("%B"),year=year_obj)
+
+    # finding existing month object or making a new
+    try:
+        month_obj = db.session.execute(db.select(Month).filter_by(num=int(month),
+                        user_id=user.id,year_id=year_obj.id)).scalar_one()
+    except:
+        month_obj = Month(user=user, num=int(month), 
+                          name=training_date.strftime("%B"),year=year_obj)
         db.session.add(month_obj)
         db.session.commit()
 
     new_training.month = month_obj
 
+    # finally adding the training
     try:
         db.session.add(new_training)
         db.session.commit()
