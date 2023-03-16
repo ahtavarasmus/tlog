@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}{{day}}-{{month}}-{{year}}{% endblock %}
+{% block content %}
+<br><br>
+<div class="container-fluid">
+        <div class="row">
+            <div class="col text-center">
+                <a href="/prevday-{{day}}-{{month}}-{{year}}/" class="nav-link" method="POST">Prev</a>
+            </div>
+            <div class="col text-center">
+                <h1>{{day}}.{{month}}.{{year}}</h1>
+            </div>
+            <div class="col text-center">
+                <a href="/nextday-{{day}}-{{month}}-{{year}}/" class="nav-link" method="POST">Next</a>
+            </div>
+        </div>
+</div>
+       <br>
+       <br> 
+<div class="container">
+    
+    {% for training in trainings %}
+
+    <div class="column">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                {% if training.timeofday == 'am' %}
+              <h5 class="card-title">Morning</h5>
+                {% else %}
+              <h5 class="card-title">Afternoon</h5>
+                {% endif %}
+              <h6 class="card-subtitle mb-2 text-muted">{{ training.name }}</h6>
+
+              {% for section in training.sections %}
+              <p class="card-text">{{ section.name }}-{{section.intensity}}-{{section.time}}</p>
+              {% endfor %}
+              {% if training.comment != None %}
+              <br>
+              <p class="card-text">{{training.comment}}</p>
+              {% endif %}
+              <a href="/delete-training-{{training.id}}-{{day}}-{{month}}-{{year}}/" class="card-link">Delete Training</a>
+              <a href="#" class="card-link">Another link</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    <form action="/training-{{day}}-{{month}}-{{year}}/" method="POST">
+    <label for="main" class="form-label">New Training</label>
+    <input type="text" id="main" name="main" class="form-control" aria-describedby="inputHelpBlock">
+    <div id="inputHelpBlock" class="form-text">
+        {am/pm} {Category},{Intensity},{Time}+{Category},{Intensity},{Time}+ ...
+        e.g. am ski,pk,90 means you skied 90min pk in the morning.
+    </div>
+    <input type="submit" class="btn btn-secondary mb-2" value="Add">
+    </form>
+
+
+{% endblock %}

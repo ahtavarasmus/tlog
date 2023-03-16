@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<head>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js'></script>
+    <style>
+        ul {list-style-type:none;}
+        body {font-family: Verdana, sans-serif;}
+        /*Month header */
+        .month {
+            
+            padding:70px 25px;
+            width: 100%;
+            background: #222222;
+            text-align: center;
+        }
+        /* Month list */
+        .month ul {
+        display: flex;
+        justify-content: space-around;
+        margin: 0;
+        padding: 0;
+        }
+
+        .month ul li {
+        color: rgb(44, 182, 247);
+        width: 33%;
+        font-size: 20px;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        
+        }
+        .month ul li a {
+            display: block;
+        }
+
+        /* Previous button inside month header */
+        .month .prev {
+        width: 100px;
+        height: 100px;
+        } 
+
+        /* Next button */
+        .month .next {
+        width: 100px;
+        height: 100px;
+        }
+
+        /* Weekdays (Mon-Sun) */
+        .weekdays {
+        display: flex;
+        justify-content: space-around;
+        margin: 0;
+        padding: 10px 0;
+        background-color:rgb(44, 182, 247);
+        }
+
+        .weekdays li {
+        display: inline-block;
+        width: 13.6%;
+        color: #eee;
+        text-align: center;
+        }
+
+        /* Days (1-31) */
+        .days {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        padding: 10px 0;
+        background: #222222;
+        margin: 0;
+        
+        }
+
+        .days div {
+        list-style-type: none;
+        display: inline-block;
+        width: 13.6%; 
+        height: 70px;
+        line-height: 70px;
+        text-align: center;
+        margin-bottom: 5px;
+        font-size:12px;
+        color: rgb(44, 182, 247);
+        background-color: #222222;
+        }
+        .days div a {
+            display: block;
+            color: inherit;
+            text-decoration: inherit;
+        }
+        .monthdays:hover {
+            background-color: rgb(44, 182, 247);
+
+        }
+
+        /* Highlight the "current" day */
+        .days div .active {
+        padding: 5px;
+        background: #1abc9c;
+        color: white !important
+m        }
+
+        #monthdays {
+            background-color: #302e2e;
+        }
+        #monthdays:hover {
+            background-color: rgb(44, 182, 247);
+            color: #302e2e;
+        }
+    </style>
+</head> 
+
+{% if user.is_authenticated %}
+<p>Logged in as {{ user.username }}</p>
+{% if cur_view == "month" %}
+<div class="month">
+    <ul>
+        <li class="prev">
+            <a href="/previous-month-routes.home/" method='POST'> &#10094;</a>
+            <br>
+            <a href="/previous-year-routes.home/" method='POST'> &#10094;</a>
+        </li>
+
+        <li><a href="/month-summary/">{{ current_month_name }}<br></a>
+        <a href="/year-summary/"><span style="font-size:18px">{{ current_year }}</span></a>
+        </li>
+        <li class="next">
+            <a href="/next-month-routes.home/" method='POST'> &#10095;</a>
+            <br>
+            <a href="/next-year-routes.home/" method='POST'> &#10095;</a>
+        </li>
+    </ul>
+    <a href="/reset-to-home/" method="POST">Reset date</a>
+</div>
+<ul class="weekdays">
+    <li>Mo</li>
+    <li>Tu</li>
+    <li>We</li>
+    <li>Th</li>
+    <li>Fr</li>
+    <li>Sa</li>
+    <li>Su</li>
+</ul>
+<div class="days">
+    {% for last_mo_day in fill_last_month %}
+    <div class="notmonthdays">{{ last_mo_day }} 
+    </div>
+    {% endfor %}
+    {% for daynum in list_of_days %}
+    {% if daynum == current_day %}
+    {% if real_date %}
+    <div style="background-color: rgb(44, 182, 247);color: #302e2e;" id="monthdays"> 
+
+        <a href="/training-{{ daynum }}-{{ current_month_int }}-{{ current_year }}">
+        {{daynum}}
+        </a>
+    </div>
+    {% endif %}
+    {% else %}
+    <div id="monthdays"> 
+       <a href="/training-{{ daynum }}-{{ current_month_int }}-{{ current_year }}">
+           
+           {{daynum}}
+       </a>  
+    </div>
+
+    {% endif %}
+
+    {% endfor %}
+    {% for next_mo_day in fill_next_month %}
+    <div class="notmonthdays"> {{ next_mo_day }}</div>
+    {% endfor %}
+    
+</div>
+{% else %} <!-- cur_view == "trainings" -->
+{% for training in trainings %}
+    <div class="column">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                {% if training.timeofday == 'am' %}
+              <h5 class="card-title">Morning</h5>
+                {% else %}
+              <h5 class="card-title">Afternoon</h5>
+                {% endif %}
+              <h6 class="card-subtitle mb-2 text-muted">{{ training.name }}</h6>
+
+              {% for section in training.sections %}
+              <p class="card-text">{{ section.name }}-{{section.intensity}}-{{section.time}}</p>
+              {% endfor %}
+              {% if training.comment != None %}
+              <br>
+              <p class="card-text">{{training.comment}}</p>
+              {% endif %}
+              <a href="/delete-training-{{training.id}}-{{day}}-{{month}}-{{year}}/" class="card-link">Delete Training</a>
+            </div>
+        </div>
+    </div>
+
+{% endfor %}
+
+{% endif %}
+{% else %}
+<p>Not logged in</p>
+<p>tlog - training log that keeps track of your trainings!</p>
+<p>More info <a href="https://ahtavarasm.us/projects/tlog.html">here</a></p>
+
+{% endif %}
+
+
+{% endblock %}
