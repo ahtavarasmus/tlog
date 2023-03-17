@@ -43,9 +43,9 @@ def create_app():
     app.register_blueprint(auth, url_prefix='/')
     app.register_blueprint(routes, url_prefix='/')
 
-    if not path.exists(f'emailapp/{DB_NAME}'):
-        with app.app_context():
-            db.create_all()
+    #if not path.exists(f'src/{DB_NAME}'):
+        #with app.app_context():
+            #db.create_all()
 
     from .models import User
 
