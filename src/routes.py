@@ -71,6 +71,7 @@ def home():
     list_of_days=list_of_days,
     fill_last_month=fill_last_month,
     fill_next_month=fill_next_month,
+
     )
 
 @login_required
