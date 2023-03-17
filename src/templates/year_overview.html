@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Year Overview{% endblock %}
+{% block content %}
+        <div>MOI</div>
+<div class="container">
+    {% for day,trainings in days.items() %}
+    <div class="row align-items-center">
+        <div>{{day}}</div>
+        {% for training in trainings %}
+        <div class="col">
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    {% if training.timeofday == 'am' %}
+                  <h5 class="card-title">Morning</h5>
+                    {% else %}
+                  <h5 class="card-title">Afternoon</h5>
+                    {% endif %}
+                  <h6 class="card-subtitle mb-2 text-muted">{{ training.name }}</h6>
+
+                  {% for section in training.sections %}
+                  <p class="card-text">{{ section.name }}-{{section.intensity}}-{{section.time}}</p>
+                  {% endfor %}
+                  {% if training.comment != None %}
+                  <br>
+                  <p class="card-text">{{training.comment}}</p>
+                  {% endif %}
+                  <a href="/delete-training-{{training.id}}-{{day}}-{{month}}-{{year}}/" class="card-link">Delete Training</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

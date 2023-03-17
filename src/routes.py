@@ -7,8 +7,8 @@ from .models import MonthsCategorysIntensity, MonthsTrainingCategory, User, Trai
 from . import db,mail
 from datetime import datetime as dt
 import datetime
-from .utils import (load_month_view, load_trainings_view, validate_training,
-                    add_training_to_db,load_trainings_view)
+from .utils import (load_month_view, load_year_overview, validate_training,
+                    add_training_to_db)
 
 
 from twilio.twiml.messaging_response import MessagingResponse
@@ -41,14 +41,7 @@ def home():
     (real_date,current_day,current_month_int,current_month_name,
     current_year,days_in_month,list_of_days,fill_last_month,
     fill_next_month) = load_month_view()
-    cur_view = "month"
 
-    trainings = []
-
-
-    if session.get('cur_view',default="month") == "trainings":
-        trainings = load_trainings_view()
-        cur_view = "trainings"
 
 
     if request.method == 'POST':
@@ -69,7 +62,6 @@ def home():
     return render_template('home.html',
     user=current_user,
     active_tag='active',
-    cur_view=cur_view,
     real_date=real_date,
     current_day=current_day,
     current_month_int=current_month_int,
@@ -79,8 +71,15 @@ def home():
     list_of_days=list_of_days,
     fill_last_month=fill_last_month,
     fill_next_month=fill_next_month,
-    trainings=trainings
     )
+
+@login_required
+@routes.route("/year-overview", methods=['POST','GET'])
+def year_overview():
+    days = load_year_overview()
+    return render_template('year_overview.html',
+                           user=current_user,
+                           days=days)
     
 
 @login_required

@@ -6,44 +6,45 @@ from datetime import datetime
 import calendar
 import re
 
-def load_trainings_view():
-    current_year = session.get('year',default=datetime.now().year)
+def load_year_overview():
+    current_year = int(session.get('year',default=datetime.now().year))
     days = dict() 
-    for month in range(1,13):
-        for day in range(1,calendar.monthrange(1,month)[1] + 1):
-            trainings = db.session.execute(db.select(Training)
-                            .filter_by(training_date=
-                            datetime(current_year,month,day))).scalar_one()
-            days[f"{current_year}.{month}.{day}"] = trainings
-
-
-
-    trainings = current_user.trainings
-    
+    for t in db.session.execute(db.select(Training)).scalars():
+        print(t.name)
+    print("LEN ",len(current_user.trainings))
     if current_user.year_start > current_user.year_end: # we need two maps
-    def all_dates_in_year(year=2019):
-        for month in range(1, 13): # Month is always 1..12
-            for day in range(1, calendar.monthrange(year, month)[1] + 1):
-            yield Date(year, month, day)
-         
-        prev_year_months = [*range(current_user.year_start,13)] #includes year_start->13 including start month
-        next_year_months = [*range(1,current_user.year_end)] #includes 1->year-end but not including the end month
-        clicked_month = session['month']
-        c_year = int(cur_year)
-        n_year = int(cur_year)+1
+        for month in range(current_user.year_start,13):
+            for day in range(1,calendar.monthrange(1,month)[1] + 1):
+                for t in current_user.trainings:
+                    if t.training_date == datetime(current_year,month,day):
+                        date = f"{current_year}.{month}.{day}"
+                        if date in days.keys():
+                            days[date].append(t)
+                        else:
+                            days[date] = [t]
+        current_year += 1
+        for month in range(1,current_user.year_end+1):
+            for day in range(1,calendar.monthrange(1,month)[1] + 1):
+                for t in current_user.trainings:
+                    if t.training_date == datetime(current_year,month,day):
+                        date = f"{current_year}.{month}.{day}"
+                        if date in days.keys():
+                            days[date].append(t)
+                        else:
+                            days[date] = [t]
 
-        if clicked_month in next_year_months:
-            n_year = int(cur_year)
-            c_year = int(cur_year)-1
-        months_in[c_year] = prev_year_months
-        months_in[n_year] = next_year_months 
-        season = str(c_year) + "-" + str(n_year)
     else:
-        months_in[int(cur_year)] = [*range(current_user.year_start,current_user.year_end)]
-        season = cur_year
-
-
-    return trainings
+        for month in range(current_user.year_start,current_user.year_end+1):
+            for day in range(1,calendar.monthrange(1,month)[1] + 1):
+                for t in current_user.trainings:
+                    if t.training_date == datetime(current_year,month,day):
+                        date = f"{current_year}.{month}.{day}"
+                        if date in days.keys():
+                            days[date].append(t)
+                        else:
+                            days[date] = [t]
+   
+    return days
 
 
 def load_month_view():
