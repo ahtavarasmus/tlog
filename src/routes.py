@@ -4,7 +4,7 @@ from flask import redirect, url_for, render_template, request, Blueprint, Markup
 from flask_login import login_required, current_user
 from flask_mail import Message
 from .models import MonthsCategorysIntensity, MonthsTrainingCategory, User, Training, TrainingSection, Category, Month, Year
-from . import db,mail
+
 from datetime import datetime as dt
 import datetime
 from .utils import (load_month_view, load_year_overview, validate_training,
@@ -43,7 +43,6 @@ def home():
     fill_next_month) = load_month_view()
 
 
-    print("MOI")
 
     if request.method == 'POST':
         year = request.form['year']
@@ -78,7 +77,6 @@ def home():
 @login_required
 @routes.route("/year-overview", methods=['POST','GET'])
 def year_overview():
-    print("MOI")
     days = load_year_overview()
     return render_template('year_overview.html',
                            user=current_user,
@@ -118,7 +116,7 @@ def month_summary():
                                 month_overall += section.time
                             if section.category.name in categories.keys():
                                 print("UPDATING CATEGORY!!!!")
-                                categories[section.category.name] += section.time
+                             
                             else:
                                 categories[section.category.name] = section.time
                                 print("FIRST ONE IN CATEGORY!!!!!")
