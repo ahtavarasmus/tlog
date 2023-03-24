@@ -1,6 +1,6 @@
 from email.quoprimime import body_check
 from textwrap import fill
-from flask import redirect, url_for, render_template, request, Blueprint, Markup, json, current_app
+from flask import redirect, url_for, render_template, request, Blueprint, Markup, json, current_app,flash
 from flask_login import login_required, current_user
 from flask_mail import Message
 from .models import MonthsCategorysIntensity, MonthsTrainingCategory, User, Training, TrainingSection, Category, Month, Year

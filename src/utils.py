@@ -1,4 +1,4 @@
-from flask import session,render_template
+from flask import session,render_template,flash
 from flask_login import current_user 
 from .models import User,Training,Category,TrainingSection,Year,Month
 from . import db
@@ -10,8 +10,7 @@ def load_year_overview():
     current_year = int(session.get('year',default=datetime.now().year))
     days = dict() 
     for t in db.session.execute(db.select(Training)).scalars():
-
-        pass
+        flash(t.timeofday)
     print("LEN ",len(current_user.trainings))
     if current_user.year_start > current_user.year_end: # we need two maps
         for month in range(current_user.year_start,13):
@@ -19,6 +18,7 @@ def load_year_overview():
                 for t in current_user.trainings:
                     if t.training_date == datetime(current_year,month,day):
                         date = f"{current_year}.{month}.{day}"
+                        flash(date)
                         if date in days.keys():
                             days[date].append(t)
                         else:
@@ -29,6 +29,7 @@ def load_year_overview():
                 for t in current_user.trainings:
                     if t.training_date == datetime(current_year,month,day):
                         date = f"{current_year}.{month}.{day}"
+                        flash(date)
                         if date in days.keys():
                             days[date].append(t)
                         else:
@@ -40,6 +41,7 @@ def load_year_overview():
                 for t in current_user.trainings:
                     if t.training_date == datetime(current_year,month,day):
                         date = f"{current_year}.{month}.{day}"
+                        flash(date)
                         if date in days.keys():
                             days[date].append(t)
                         else:
