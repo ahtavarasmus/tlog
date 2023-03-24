@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect, url_for, render_template
+from flask import Blueprint, request, redirect, url_for, render_template,flash
 from flask_login import login_user, current_user
 from flask_login.utils import logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -28,6 +28,7 @@ def login():
                 session['year'] = datetime.now().year
                 session['month'] = datetime.now().month
                 session['day'] = datetime.now().day
+                flash('Logged in successfully.', category='success')
                 return redirect(url_for('routes.home'))
             else:
                 return 'wrong password'
