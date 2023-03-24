@@ -10,7 +10,8 @@ def load_year_overview():
     current_year = int(session.get('year',default=datetime.now().year))
     days = dict() 
     for t in db.session.execute(db.select(Training)).scalars():
-        print(t.name)
+
+        pass
     print("LEN ",len(current_user.trainings))
     if current_user.year_start > current_user.year_end: # we need two maps
         for month in range(current_user.year_start,13):

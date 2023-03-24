@@ -77,8 +77,6 @@ pyglet==2.0.3
 Pygments==2.11.2
 PyJWT==2.4.0
 pynvim==0.4.3
-pyobjc-core==9.0.1
-pyobjc-framework-Cocoa==9.0.1
 pyparsing==3.0.7
 pyrr==0.10.3
 pyrsistent==0.18.1

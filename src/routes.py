@@ -43,6 +43,7 @@ def home():
     fill_next_month) = load_month_view()
 
 
+    print("MOI")
 
     if request.method == 'POST':
         year = request.form['year']
@@ -77,6 +78,7 @@ def home():
 @login_required
 @routes.route("/year-overview", methods=['POST','GET'])
 def year_overview():
+    print("MOI")
     days = load_year_overview()
     return render_template('year_overview.html',
                            user=current_user,
