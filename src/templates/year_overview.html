@@ -18,7 +18,7 @@
                   <h6 class="card-subtitle mb-2 text-muted">{{ training.name }}</h6>
 
                   {% for section in training.sections %}
-                  <p class="card-text">{{ section.name }}-{{section.intensity}}-{{section.time}}</p>
+                  <p class="card-text">{{ section.name }}-{% if training.name == "Jumping" %}{{section.jumps}}{% else %}{{section.intensity}}{% endif %}-{{section.time}}</p>
                   {% endfor %}
                   {% if training.comment != None %}
                   <br>
