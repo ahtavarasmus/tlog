@@ -9,6 +9,7 @@ from datetime import datetime as dt
 import datetime
 from .utils import (load_month_view, load_year_overview, validate_training,
                     add_training_to_db)
+from . import db
 
 
 from twilio.twiml.messaging_response import MessagingResponse
