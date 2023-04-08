@@ -10,13 +10,14 @@ def load_year_overview():
     current_year = int(session.get('year',default=datetime.now().year))
     current_month = int(session.get('month',default=datetime.now().month))
     days = dict() 
-    if current_user.year_start > current_user.year_end: # we need two maps
+    if current_user.year_start >= current_user.year_end: # we need two maps
         if 0 < current_month < current_user.year_end:
             current_year -= 1
         for month in range(current_user.year_start,13):
             for day in range(1,calendar.monthrange(1,month)[1] + 1):
                 for t in current_user.trainings:
                     if t.training_date == datetime(current_year,month,day):
+                        date = f"{current_year}.{month}.{day}"
                         if date in days.keys():
                             days[date].append(t)
                         else:
