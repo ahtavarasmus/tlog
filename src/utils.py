@@ -6,18 +6,48 @@ from datetime import datetime
 import calendar
 import re
 
+def training_time(training):
+    """ returns number of hours trained in given Training 
+        param: Training, Training object
+        return: Int, time in hours
+    """
+    time = 0
+    for section in training.sections:
+        if section.category.name == "jumping":
+            continue
+        time += section.time
+
+    return time
+
+
 def load_year_overview():
+
+    # TODO: I could make a separate map which could have date as key like below
+    # and only have mondays as keys. Then value for that monday could hold 
+    # week summary
+    # TODO: make same for month but it would hold every first day as a key
+
     current_year = int(session.get('year',default=datetime.now().year))
+    y = current_year # help for season definition
     current_month = int(session.get('month',default=datetime.now().month))
+    weeks = dict()
     days = dict() 
     if current_user.year_start >= current_user.year_end: # we need two maps
+        monday = ""
         if 0 < current_month < current_user.year_end:
             current_year -= 1
+            y -= 1
         for month in range(current_user.year_start,13):
             for day in range(1,calendar.monthrange(1,month)[1] + 1):
+                d = datetime(current_year,month,day)
+                if d.weekday() == 0 or monday == "":
+                    monday = f"{day}/{month}/{current_year}"
+                    weeks[monday] = (0,d.isocalendar()[1]) # 2. number of week
+
                 for t in current_user.trainings:
-                    if t.training_date == datetime(current_year,month,day):
-                        date = f"{current_year}.{month}.{day}"
+                    if t.training_date == d:
+                        weeks[monday] = (round(weeks[monday][0]+training_time(t)),weeks[monday][1])
+                        date = f"{day}/{month}/{current_year}"
                         if date in days.keys():
                             days[date].append(t)
                         else:
@@ -25,26 +55,40 @@ def load_year_overview():
         current_year += 1
         for month in range(1,current_user.year_end+1):
             for day in range(1,calendar.monthrange(1,month)[1] + 1):
+                d = datetime(current_year,month,day)
+                if d.weekday() == 0 or monday == "":
+                    monday = f"{day}/{month}/{current_year}"
+                    weeks[monday] = (0,d.isocalendar()[1]) # 2. number of week
                 for t in current_user.trainings:
                     if t.training_date == datetime(current_year,month,day):
-                        date = f"{current_year}.{month}.{day}"
+                        weeks[monday] = (round(weeks[monday][0]+training_time(t)),weeks[monday][1])
+                        date = f"{day}/{month}/{current_year}"
                         if date in days.keys():
                             days[date].append(t)
                         else:
                             days[date] = [t]
 
+        season = str(y) + "-" + str(y+1)
+
     else:
+        monday = ""
         for month in range(current_user.year_start,current_user.year_end+1):
             for day in range(1,calendar.monthrange(1,month)[1] + 1):
+                d = datetime(current_year,month,day)
+                if d.weekday() == 0 or monday == "":
+                    monday = f"{day}/{month}/{current_year}"
+                    weeks[monday] = (0,d.isocalendar()[1]) # 2. number of week
                 for t in current_user.trainings:
                     if t.training_date == datetime(current_year,month,day):
-                        date = f"{current_year}.{month}.{day}"
+                        weeks[monday] = (round(weeks[monday][0]+training_time(t)),weeks[monday][1])
+                        date = f"{day}/{month}/{current_year}"
                         if date in days.keys():
                             days[date].append(t)
                         else:
                             days[date] = [t]
+        season = str(y)
    
-    return days
+    return season,weeks,days
 
 
 def load_month_view():
@@ -95,17 +139,17 @@ def load_month_view():
 
 
 def validate_training(raw):
+    """ this is not foolproof:D """
     if re.search("^..\s", raw) == None:
         return False
     parts = raw.split(" ")
     if len(parts) == 2:
         # no comment
         _, raw = parts # removing the "ap "
-    elif len(parts) == 3:
+    elif len(parts) > 2:
         # comment
-        _, raw, _= parts # removing "ap " and comment
+        raw = parts[1] # training description
     else:
-        # if more than max two spaces
         return False
     sections = raw.split("+") # splitting from + multiple
     for s in sections:
@@ -130,8 +174,15 @@ def add_training_to_db(user, raw_main,day,month,year):
     main = ""
     if len(parts) == 2:
         timeofday, main = parts
-    elif len(parts) == 3:
-        timeofday, main, comment = parts
+    elif len(parts) > 2:
+        timeofday = parts[0]
+        main = parts[1]
+        for i,word in enumerate(parts[2:]):
+            if i == 0:
+                comment += word
+            else:
+                comment += " " + word
+                
 
     # making the training object
     new_training = Training(user=user, name=raw_main, comment=comment, timeofday=timeofday,training_date=training_date)

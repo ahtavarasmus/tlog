@@ -78,9 +78,11 @@ def home():
 @login_required
 @routes.route("/year-overview", methods=['POST','GET'])
 def year_overview():
-    days = load_year_overview()
+    season,weeks,days = load_year_overview()
     return render_template('year_overview.html',
                            user=current_user,
+                           season=season,
+                           weeks=weeks,
                            days=days)
     
 
@@ -116,8 +118,8 @@ def month_summary():
                             if section.category.name != "jumping":
                                 month_overall += section.time
                             if section.category.name in categories.keys():
+                                categories[section.category.name] += section.time
                                 print("UPDATING CATEGORY!!!!")
-                             
                             else:
                                 categories[section.category.name] = section.time
                                 print("FIRST ONE IN CATEGORY!!!!!")
@@ -167,7 +169,7 @@ def year_summary():
     
     
     months_in = {}
-    if current_user.year_start > current_user.year_end: # we need two maps
+    if current_user.year_start >= current_user.year_end: # we need two maps
          
         prev_year_months = [*range(current_user.year_start,13)] #includes year_start->13 including start month
         next_year_months = [*range(1,current_user.year_end)] #includes 1->year-end but not including the end month

@@ -1,9 +1,20 @@
 {% extends 'base.html' %}
-{% block title %}Year Overview{% endblock %}
+{% block title %}Season {{season}} Overview{% endblock %}
 {% block content %}
-        <div>MOI</div>
+
+<a href="/previous-year-routes.year_overview/" method='POST'> &#10094;</a>
+<h1>Season {{season}}</h1>
+<a href="/next-year-routes.year_overview/" method='POST'> &#10095;</a>
 <div class="container">
     {% for day,trainings in days.items() %}
+    {% for monday,data in weeks.items() %}
+    <h1>mon {{ monday }}</h1>
+    <h1>day {{day}}</h1>
+    {% if day == monday %}
+    <h2>Week {{ data[1] }}</h2>
+    <h3>This week: {{ data[0] }} h</h3>
+    {% endif %}
+    {% endfor %}
     <div class="row align-items-center">
         <div>{{day}}</div>
         {% for training in trainings %}
@@ -11,19 +22,30 @@
             <div class="card" style="width: 18rem;">
                 <div class="card-body">
                     {% if training.timeofday == 'am' %}
-                  <h5 class="card-title">Morning</h5>
+                    <h5 class="card-title">Morning {{ training.name }}</h5>
                     {% else %}
-                  <h5 class="card-title">Afternoon</h5>
+                    <h5 class="card-title">Afternoon {{ training.name }}</h5>
                     {% endif %}
-                  <h6 class="card-subtitle mb-2 text-muted">{{ training.name }}</h6>
+                      {% for section in training.sections %}
+                          <p class="card-text">{{ section.name }}
+                          -
+                          {% if training.name == "Jumping" %}
+                            {{section.jumps}}
+                          {% else %}
+                            {{section.intensity}}
+                          {% endif %}
+                          -
+                          {{section.time}}</p>
+                      {% endfor %}
+                      {% if training.comment != None %}
+                      <p class="card-text">{{training.comment}}</p>
+                      {% endif %}
+                    <a href="/training-{{training.training_date.day}}-
+                        {{training.training_date.month}}-{{training.training_date.year}}/" 
+                        class="card-link">Go to Training</a>
+                    <br>
+                    <br>
 
-                  {% for section in training.sections %}
-                  <p class="card-text">{{ section.name }}-{% if training.name == "Jumping" %}{{section.jumps}}{% else %}{{section.intensity}}{% endif %}-{{section.time}}</p>
-                  {% endfor %}
-                  {% if training.comment != None %}
-                  <br>
-                  <p class="card-text">{{training.comment}}</p>
-                  {% endif %}
                 </div>
             </div>
         </div>
