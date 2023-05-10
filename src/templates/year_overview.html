@@ -11,6 +11,8 @@
     {% for monday,data in weeks.items() %}
     {% if day == monday %}
     {% if data[0] != 0 %}
+    <br>
+    <br>
     <h2 style="color:white;"><span>Week {{ data[1] }} ({{data[0]}} h)</span></h2>
     {% endif %}
     {% endif %}
