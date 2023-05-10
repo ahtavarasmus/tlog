@@ -4,19 +4,20 @@
 
 <a href="/previous-year-routes.year_overview/" method='POST'> &#10094;</a>
 <h1>Season {{season}}</h1>
+<br>
 <a href="/next-year-routes.year_overview/" method='POST'> &#10095;</a>
 <div class="container">
     {% for day,trainings in days.items() %}
     {% for monday,data in weeks.items() %}
-    <h1>mon {{ monday }}</h1>
-    <h1>day {{day}}</h1>
     {% if day == monday %}
-    <h2>Week {{ data[1] }}</h2>
-    <h3>This week: {{ data[0] }} h</h3>
+    {% if data[0] != 0 %}
+    <h2 style="color:white;"><span>Week {{ data[1] }} ({{data[0]}} h)</span></h2>
+    {% endif %}
     {% endif %}
     {% endfor %}
     <div class="row align-items-center">
-        <div>{{day}}</div>
+        <div style="color:white;">{{day}}</div>
+        {% if trainings != [] %}
         {% for training in trainings %}
         <div class="col">
             <div class="card" style="width: 18rem;">
@@ -50,6 +51,11 @@
             </div>
         </div>
         {% endfor %}
+        {% else %}
+        <br>
+        <h5>Lepo</h5>
+        <br>
+        {% endif %}
     </div>
     {% endfor %}
 </div>
