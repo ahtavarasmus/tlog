@@ -8,7 +8,7 @@ from .models import MonthsCategorysIntensity, MonthsTrainingCategory, User, Trai
 from datetime import datetime as dt
 import datetime
 from .utils import (load_month_view, load_year_overview, validate_training,
-                    add_training_to_db)
+                    add_training_to_db,get_year_summary)
 from . import db
 
 
@@ -78,9 +78,13 @@ def home():
 @login_required
 @routes.route("/year-overview", methods=['POST','GET'])
 def year_overview():
-    season,weeks,days = load_year_overview()
+    season,weeks,days,intensities,categories,jumps,overall = load_year_overview()
     return render_template('year_overview.html',
                            user=current_user,
+                           intensities=intensities,
+                           categories=categories,
+                           jumps=jumps,
+                           overall=overall,
                            season=season,
                            weeks=weeks,
                            days=days)
@@ -160,67 +164,8 @@ def month_summary():
 @login_required
 @routes.route("/year-summary/", methods=['POST', 'GET'])
 def year_summary():
-    
-    overall = 0
-    categories = {}
-    intensities = {}
-    jumps = 0
-    cur_year = session['year']
-    
-    
-    months_in = {}
-    if current_user.year_start >= current_user.year_end: # we need two maps
-         
-        prev_year_months = [*range(current_user.year_start,13)] #includes year_start->13 including start month
-        next_year_months = [*range(1,current_user.year_end)] #includes 1->year-end but not including the end month
-        clicked_month = session['month']
-        c_year = int(cur_year)
-        n_year = int(cur_year)+1
 
-        if clicked_month in next_year_months:
-            n_year = int(cur_year)
-            c_year = int(cur_year)-1
-        months_in[c_year] = prev_year_months
-        months_in[n_year] = next_year_months 
-        season = str(c_year) + "-" + str(n_year)
-    else:
-        months_in[int(cur_year)] = [*range(current_user.year_start,current_user.year_end)]
-        season = cur_year
-
-
- 
-    for year in current_user.years:
-        if year.num in months_in.keys():
-            for month in year.months:
-                if month.num in months_in[year.num]:
-                    for training in month.trainings:
-                        for section in training.sections:
-                            if section.category.name != "jumping":
-                                overall += section.time
-                            if section.category.name in categories.keys():
-                                print("UPDATING CATEGORY!!!!")
-                                categories[section.category.name] += section.time
-                            else:
-                                categories[section.category.name] = section.time
-                                print("FIRST ONE IN CATEGORY!!!!!")
-
-                            if section.category.name == "jumping":
-                                jumps += section.jumps
-                            else:
-                                if section.intensity in intensities.keys():
-                                    print("UPDATING INTENSITY!!!!")
-                                    intensities[section.intensity] += section.time
-                                else:
-                                    print("FIRST ONE IN INTENSITY!!!!!")
-                                    intensities[section.intensity] = section.time
-
-    for c in categories.keys():
-        categories[c] = round(categories[c] / 60, 1)
-
-    for i in intensities.keys():
-        intensities[i] = round(intensities[i] / 60, 1)
-
-    overall = round(overall / 60, 1)
+    intensities,categories,jumps,overall,season = get_year_summary()
 
     return render_template("year_summary.html",     
             user=current_user,

@@ -19,6 +19,73 @@ def training_time(training):
 
     return time
 
+def get_year_summary():
+ 
+    overall = 0
+    categories = {}
+    intensities = {}
+    jumps = 0
+    cur_year = session['year']
+    
+    
+    months_in = {}
+    if current_user.year_start >= current_user.year_end: # we need two maps
+         
+        prev_year_months = [*range(current_user.year_start,13)] #includes year_start->13 including start month
+        next_year_months = [*range(1,current_user.year_end)] #includes 1->year-end but not including the end month
+        clicked_month = session['month']
+        c_year = int(cur_year)
+        n_year = int(cur_year)+1
+
+        if clicked_month in next_year_months:
+            n_year = int(cur_year)
+            c_year = int(cur_year)-1
+        months_in[c_year] = prev_year_months
+        months_in[n_year] = next_year_months 
+        season = str(c_year) + "-" + str(n_year)
+    else:
+        months_in[int(cur_year)] = [*range(current_user.year_start,current_user.year_end)]
+        season = cur_year
+
+
+ 
+    for year in current_user.years:
+        if year.num in months_in.keys():
+            for month in year.months:
+                if month.num in months_in[year.num]:
+                    for training in month.trainings:
+                        for section in training.sections:
+                            if section.category.name != "jumping":
+                                overall += section.time
+                            if section.category.name in categories.keys():
+                                print("UPDATING CATEGORY!!!!")
+                                categories[section.category.name] += section.time
+                            else:
+                                categories[section.category.name] = section.time
+                                print("FIRST ONE IN CATEGORY!!!!!")
+
+                            if section.category.name == "jumping":
+                                jumps += section.jumps
+                            else:
+                                if section.intensity in intensities.keys():
+                                    print("UPDATING INTENSITY!!!!")
+                                    intensities[section.intensity] += section.time
+                                else:
+                                    print("FIRST ONE IN INTENSITY!!!!!")
+                                    intensities[section.intensity] = section.time
+
+    for c in categories.keys():
+        categories[c] = round(categories[c] / 60, 1)
+
+    for i in intensities.keys():
+        intensities[i] = round(intensities[i] / 60, 1)
+
+    overall = round(overall / 60, 1)
+    return intensities,categories,jumps,overall,season
+
+
+
+
 
 def load_year_overview():
 
@@ -129,7 +196,9 @@ def load_year_overview():
     sorted_weeks_items = sorted(weeks.items(), key=lambda x: datetime.strptime(x[0], '%d/%m/%Y'), reverse=True)
     reversed_weeks = dict(sorted_weeks_items)
 
-    return season,reversed_weeks,days
+    intensities,categories,jumps,overall,season = get_year_summary()
+
+    return season,reversed_weeks,days,intensities,categories,jumps,overall
 
 
 def load_month_view():

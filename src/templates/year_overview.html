@@ -2,10 +2,40 @@
 {% block title %}Season {{season}} Overview{% endblock %}
 {% block content %}
 
-<a href="/previous-year-routes.year_overview/" method='POST'> &#10094;</a>
-<h1>Season {{season}}</h1>
-<br>
-<a href="/next-year-routes.year_overview/" method='POST'> &#10095;</a>
+<header>
+    <div style="display: flex; align-items: center; justify-content: center;">
+        <a href="/previous-year-routes.year_overview/" method='POST' style="margin-right: 20px;">&#10094;</a>
+        <span><h1 style="margin: 0;">Season {{season}}</h1></span>
+        <a href="/next-year-routes.year_overview/" method='POST' style="margin-left: 20px;">&#10095;</a>
+    </div>
+</header>
+
+<content>
+    <h3> Categories </h3>
+    {% for category, time in categories.items() %}
+        <ul>
+            <li>{{category}}: {{time}} h</li>
+        </ul>
+    {% endfor %}
+    <h3> Intensities </h3>
+    {% for intensity, time in intensities.items() %}
+        <ul>
+            <li>{{intensity}}: {{time}} h</li>
+        </ul>
+    {% endfor %}
+    <h3> YEAR OVERALL</h3>
+    <ul>
+        <li>{{ overall }} h</li>
+        {% if jumps != 0 %}
+            <li>{{jumps}} jumps</li>
+        {% else %}
+            <li>0 jumps</li>
+        {% endif %}
+    </ul>
+    <br>
+    <p>*jumping time not included in overall time</p>
+
+</content>
 <div class="container">
     {% for monday,week_data in weeks.items() %}
 
