@@ -7,58 +7,58 @@
 <br>
 <a href="/next-year-routes.year_overview/" method='POST'> &#10095;</a>
 <div class="container">
-    {% for day,trainings in days.items() %}
-    {% for monday,data in weeks.items() %}
-    {% if day == monday %}
-    {% if data[0] != 0 %}
-    <br>
-    <br>
-    <h2 style="color:white;"><span>Week {{ data[1] }} ({{data[0]}} h)</span></h2>
-    {% endif %}
-    {% endif %}
-    {% endfor %}
-    <div class="row align-items-center">
-        <div style="color:white;">{{day}}</div>
-        {% if trainings != [] %}
-        {% for training in trainings %}
-        <div class="col">
-            <div class="card" style="width: 18rem;">
-                <div class="card-body">
+    {% for monday,week_data in weeks.items() %}
+
+        {% if week_data.total_time != 0 %}
+            <br>
+            <br>
+            <h2 style="color:white;"><span>Week {{ week_data.week_number }} ({{week_data.total_time}} h)</span></h2>
+        {% endif %}
+
+        {% for day,trainings in week_data.days.items() %}
+            <div class="row align-items-center">
+            <div style="color:white;">{{day}}</div>
+            {% if trainings != [] %}
+                {% for training in trainings %}
+                    <div class="col">
+                    <div class="card" style="width: 18rem;">
+                    <div class="card-body">
                     {% if training.timeofday == 'am' %}
-                    <h5 class="card-title">Morning {{ training.name }}</h5>
+                        <h5 class="card-title">Morning {{ training.name }}</h5>
                     {% else %}
-                    <h5 class="card-title">Afternoon {{ training.name }}</h5>
+                        <h5 class="card-title">Afternoon {{ training.name }}</h5>
                     {% endif %}
-                      {% for section in training.sections %}
-                          <p class="card-text">{{ section.name }}
-                          -
-                          {% if training.name == "Jumping" %}
+                    {% for section in training.sections %}
+                        <p class="card-text">{{ section.name }}
+                        -
+                        {% if training.name == "Jumping" %}
                             {{section.jumps}}
-                          {% else %}
+                        {% else %}
                             {{section.intensity}}
-                          {% endif %}
-                          -
-                          {{section.time}}</p>
-                      {% endfor %}
-                      {% if training.comment != None %}
-                      <p class="card-text">{{training.comment}}</p>
-                      {% endif %}
+                        {% endif %}
+                        -
+                        {{section.time}}</p>
+                    {% endfor %}
+                    {% if training.comment != None %}
+                        <p class="card-text">{{training.comment}}</p>
+                    {% endif %}
                     <a href="/training-{{training.training_date.day}}-
                         {{training.training_date.month}}-{{training.training_date.year}}/" 
                         class="card-link">Go to Training</a>
                     <br>
                     <br>
 
-                </div>
+                    </div>
+                    </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <br>
+                <h5>Lepo</h5>
+                <br>
+            {% endif %}
             </div>
-        </div>
         {% endfor %}
-        {% else %}
-        <br>
-        <h5>Lepo</h5>
-        <br>
-        {% endif %}
-    </div>
     {% endfor %}
 </div>
 {% endblock %}

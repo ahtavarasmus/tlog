@@ -45,7 +45,7 @@ def load_year_overview():
                 date = f"{day}/{month}/{current_year}"
                 if d.weekday() == 0 or monday == "":
                     monday = date
-                    weeks[monday] = (0,d.isocalendar()[1]) # 2. number of week
+                    weeks[monday] = {"week_number": d.isocalendar()[1], "total_time": 0, "days": {}}
                 # let's not add future days to year overview yet
                 if d > actual_date:
                     continue
@@ -53,14 +53,16 @@ def load_year_overview():
                 rest_day = True
                 for t in current_user.trainings:
                     if t.training_date == d:
-                        weeks[monday] = (round(weeks[monday][0]+training_time(t)),weeks[monday][1])
+                        weeks[monday]["total_time"] += training_time(t)
                         if date in days.keys():
+                            weeks[monday]["days"][date].append(t)
                             days[date].append(t)
                         else:
-                            days[date] = [t]
+                            weeks[monday]["days"][date] = [t]
                         rest_day = False
                 if rest_day:
-                    days[date] = []
+                    weeks[monday]["days"][date] = []
+
         current_year += 1
         for month in range(1,current_user.year_end+1):
             for day in range(1,calendar.monthrange(1,month)[1] + 1):
@@ -68,7 +70,7 @@ def load_year_overview():
                 date = f"{day}/{month}/{current_year}"
                 if d.weekday() == 0 or monday == "":
                     monday = date
-                    weeks[monday] = (0,d.isocalendar()[1]) # 2. number of week
+                    weeks[monday] = {"week_number": d.isocalendar()[1], "total_time": 0, "days": {}}
                 # let's not add future days to year overview yet
                 if d > actual_date:
                     continue
@@ -77,15 +79,15 @@ def load_year_overview():
                 rest_day = True 
                 for t in current_user.trainings:
                     if t.training_date == datetime(current_year,month,day):
-                        weeks[monday] = (round(weeks[monday][0]+training_time(t)),weeks[monday][1])
+                        weeks[monday]["total_time"] += training_time(t)
                         if date in days.keys():
-                            days[date].append(t)
+                            weeks[monday]["days"][date].append(t)
                         else:
-                            days[date] = [t]
+                            weeks[monday]["days"][date] = [t]
 
                         rest_day = False
                 if rest_day:
-                    days[date] = []
+                    weeks[monday]["days"][date] = []
 
         season = str(y) + "-" + str(y+1)
 
@@ -97,7 +99,7 @@ def load_year_overview():
                 date = f"{day}/{month}/{current_year}"
                 if d.weekday() == 0 or monday == "":
                     monday = date
-                    weeks[monday] = (0,d.isocalendar()[1]) # 2. number of week
+                    weeks[monday] = {"week_number": d.isocalendar()[1], "total_time": 0, "days": {}}
 
                 # let's not add future days to year overview yet
                 if d > actual_date:
@@ -105,23 +107,29 @@ def load_year_overview():
                 rest_day = True
                 for t in current_user.trainings:
                     if t.training_date == datetime(current_year,month,day):
-                        weeks[monday] = (round(weeks[monday][0]+training_time(t)),weeks[monday][1])
+                        weeks[monday]["total_time"] += training_time(t)
                         if date in days.keys():
-                            days[date].append(t)
+                            weeks[monday]["days"][date].append(t)
                         else:
-                            days[date] = [t]
+                            weeks[monday]["days"][date] = [t]
 
                         rest_day = False
                 if rest_day:
-                    days[date] = []
+                    weeks[monday]["days"][date] = []
 
 
         season = str(y)
         
-    for day,data in weeks.items():
-        weeks[day] = tuple((round(data[0]/60,1),data[1]))
+    for monday,week_data in weeks.items():
+        week_data["total_time"] = round(week_data["total_time"] / 60, 1)
+        sorted_days = sorted(week_data["days"].items(), key=lambda x: datetime.strptime(x[0], '%d/%m/%Y'), reverse=True)
+        week_data["days"] = dict(sorted_days)
 
-    return season,weeks,days
+
+    sorted_weeks_items = sorted(weeks.items(), key=lambda x: datetime.strptime(x[0], '%d/%m/%Y'), reverse=True)
+    reversed_weeks = dict(sorted_weeks_items)
+
+    return season,reversed_weeks,days
 
 
 def load_month_view():
