@@ -121,7 +121,7 @@ def load_year_overview():
                 for t in current_user.trainings:
                     if t.training_date == d:
                         weeks[monday]["total_time"] += training_time(t)
-                        if date in days.keys():
+                        if date in weeks[monday]["days"].keys():
                             weeks[monday]["days"][date].append(t)
                             days[date].append(t)
                         else:
@@ -147,7 +147,7 @@ def load_year_overview():
                 for t in current_user.trainings:
                     if t.training_date == datetime(current_year,month,day):
                         weeks[monday]["total_time"] += training_time(t)
-                        if date in days.keys():
+                        if date in weeks[monday]["days"].keys():
                             weeks[monday]["days"][date].append(t)
                         else:
                             weeks[monday]["days"][date] = [t]
@@ -175,7 +175,7 @@ def load_year_overview():
                 for t in current_user.trainings:
                     if t.training_date == datetime(current_year,month,day):
                         weeks[monday]["total_time"] += training_time(t)
-                        if date in days.keys():
+                        if date in weeks[monday]["days"].keys():
                             weeks[monday]["days"][date].append(t)
                         else:
                             weeks[monday]["days"][date] = [t]
