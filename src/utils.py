@@ -123,7 +123,6 @@ def load_year_overview():
                         weeks[monday]["total_time"] += training_time(t)
                         if date in weeks[monday]["days"].keys():
                             weeks[monday]["days"][date].append(t)
-                            days[date].append(t)
                         else:
                             weeks[monday]["days"][date] = [t]
                         rest_day = False
