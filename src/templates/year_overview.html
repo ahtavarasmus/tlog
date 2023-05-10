@@ -1,15 +1,19 @@
 {% extends 'base.html' %}
 {% block title %}Season {{season}} Overview{% endblock %}
 {% block content %}
-
-<header>
-    <div style="display: flex; align-items: center; justify-content: center;">
-        <a href="/previous-year-routes.year_overview/" method='POST' style="margin-right: 20px;">&#10094;</a>
-        <span><h1 style="margin: 0;">Season {{season}}</h1></span>
-        <a href="/next-year-routes.year_overview/" method='POST' style="margin-left: 20px;">&#10095;</a>
-    </div>
-</header>
-
+<div class="container-fluid">
+        <div class="row">
+            <div class="col text-center">
+                <a href="/previous-year-routes.year_overview/" method='POST' class="nav-link">&#10094; Previous</a>
+            </div>
+            <div class="col text-center">
+                <h1>Season {{season}}</h1>
+            </div>
+            <div class="col text-center">
+                <a href="/next-year-routes.year_overview/" method='POST' class="nav-link">Next &#10095;</a>
+            </div>
+        </div>
+</div>
 <content>
     <h3> Categories </h3>
     {% for category, time in categories.items() %}
