@@ -94,6 +94,8 @@ def load_year_overview():
     # week summary
     # TODO: make same for month but it would hold every first day as a key
 
+    # TODO FIX THIS: IF EXCLUSIVE MONTH IS CURRENTLY INCLUSIVE
+
     actual_date = datetime.now()
 
     current_year = int(session.get('year',default=datetime.now().year))
