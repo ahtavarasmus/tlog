@@ -36,7 +36,11 @@
               {% if training.comment != "" %}
               <p class="card-text">{{training.comment}}</p>
               {% endif %}
-              <a href="/delete-training-{{training.id}}-{{day}}-{{month}}-{{year}}/" class="card-link">Delete Training</a>
+              <details>
+              <summary>Change?</summary>
+                <a href="/delete-training-{{training.id}}-{{day}}-{{month}}-{{year}}/" class="card-link">Delete Training</a>
+              </details>
+
               <br>
             </div>
         </div>

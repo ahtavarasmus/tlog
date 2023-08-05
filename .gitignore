@@ -7,4 +7,5 @@ venv/*
 venv/
 migrations/
 */__pycache__/*
-requirements.txt
+*requirements.txt*
+*.DS_Store*
