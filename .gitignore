@@ -7,3 +7,4 @@ venv/*
 venv/
 migrations/
 */__pycache__/*
+requirements.txt
