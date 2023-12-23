@@ -1,7 +1,7 @@
 
 tlog - training log that keeps track of your trainings:)
 
-http://tlog.training
+
 
 features:
 - account
